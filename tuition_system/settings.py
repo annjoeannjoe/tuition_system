@@ -163,4 +163,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CLASSIN_SID = config('CLASSIN_SID')
 CLASSIN_SECRET = config('CLASSIN_SECRET')
 
-CSRF_TRUSTED_ORIGINS = ['tuitionsystem-5395640e725b.herokuapp.com']
+CSRF_TRUSTED_ORIGINS = ['https://tuitionsystem-5395640e725b.herokuapp.com']
