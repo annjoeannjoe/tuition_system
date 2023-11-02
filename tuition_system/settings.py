@@ -28,7 +28,8 @@ SECRET_KEY = 'django-insecure-m&qj(e^puiaho@b@yh9g!pxe=q0bj4@n7s5#8korfqy2!2-)2=
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'tuitionsystem-5395640e725b.herokuapp.com'
+    'tuitionsystem-5395640e725b.herokuapp.com',
+    'tuitionsystem.me'
 ]
 
 # Application definition
@@ -163,4 +164,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CLASSIN_SID = config('CLASSIN_SID')
 CLASSIN_SECRET = config('CLASSIN_SECRET')
 
-CSRF_TRUSTED_ORIGINS = ['https://tuitionsystem-5395640e725b.herokuapp.com']
+CSRF_TRUSTED_ORIGINS = ['https://tuitionsystem-5395640e725b.herokuapp.com',
+                        'https://tuitionsystem.me']
