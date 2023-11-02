@@ -31,7 +31,6 @@ ALLOWED_HOSTS = [
     'tuitionsystem-5395640e725b.herokuapp.com'
 ]
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -163,3 +162,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Load environment varibale from .env file
 CLASSIN_SID = config('CLASSIN_SID')
 CLASSIN_SECRET = config('CLASSIN_SECRET')
+
+CSRF_TRUSTED_ORIGINS = ['tuitionsystem-5395640e725b.herokuapp.com']
