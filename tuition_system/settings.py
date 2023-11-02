@@ -80,10 +80,10 @@ WSGI_APPLICATION = 'tuition_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tuitionsystem_database',
-        'USER': 'root',
-        'PASSWORD': 'development1234#',
-        'HOST': '127.0.0.1',
+        'NAME': 'fg29qlulms7ldqhe',
+        'USER': 'b0x8n2dw7yjyhbgo',
+        'PASSWORD': 'truu48blu30zznda',
+        'HOST': 'x71wqc4m22j8e3ql.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
         'PORT': '3306',
         'OPTIONS':{
             'init_command': "SET sql_mode = 'STRICT_TRANS_TABLES'"
