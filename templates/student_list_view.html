@@ -65,6 +65,17 @@
         color: white !important;
     }
 
+    .generate-invoice-button{
+      background-color: #ebd071 !important;
+      border: #ebd071 !important;
+      color: white !important;
+    }
+
+    .generate-invoice-button:hover{
+      background-color: #bca85d !important;
+      color: white !important;
+    }
+
 
     /* Custom Styles */
     .table {
@@ -176,12 +187,14 @@
             <td>{{ student.user.phone_no }}</td>
             <td>{{ student.school_name }}</td>
             <td class="action-buttons">
-                <a href="{% url 'edit_student_detail' student.id %}" class="btn btn-primary edit-button"><i class="fas fa-edit"></i></a>
+                <a href="{% url 'edit_student_detail' student.id %}" class="btn btn-primary edit-button" title="Edit Student"><i class="fas fa-edit"></i></a>
                 <span style="margin-right: 10px;"></span>  
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ student.id }}"><i class="fas fa-trash"></i></button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ student.id }}" title="Delete Student"><i class="fas fa-trash"></i></button>
                 <span style="margin-right: 10px;"></span>  
-                <button type="button" class="btn btn-info archive-button" data-bs-toggle="modal" data-bs-target="#archiveModal{{ student.id }}"><i class="fas fa-archive"></i></button>
-            </td>
+                <button type="button" class="btn btn-info archive-button" data-bs-toggle="modal" data-bs-target="#archiveModal{{ student.id }}" title="Archive Student"><i class="fas fa-archive"></i></button>
+                <span style="margin-right: 10px;"></span>
+                <button type="button" class="btn btn-primary generate-invoice-button" data-bs-toggle="modal" data-bs-target="#generateInvoiceModal{{ student.id }}" title="Generate Invoice"><i class="far fa-file"></i></button>
+              </td>
         </tr>
         {% endfor %}
     </tbody>
@@ -259,6 +272,28 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
         <a href="{% url 'admin_archive_student' student.id %}" class="btn btn-primary">Archive</a>
+    </div>
+    </div>
+
+  </div>
+</div>
+{% endfor %}
+
+<!--Generate Invoice Modal-->
+{% for student in students %}
+<div class="modal fade" id="generateInvoiceModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><b>Generate Invoice</b></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure want to generate invoice for student with the name "{{ student.user.full_name }}"?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="{% url 'admin_generate_invoice' student.id%}" class="btn btn-primary">Generate</a>
     </div>
     </div>
 

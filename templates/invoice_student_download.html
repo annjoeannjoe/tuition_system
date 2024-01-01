@@ -1,0 +1,207 @@
+{% extends 'sidebar_student.html' %}
+{% block content %}
+
+<html>
+    <head>
+        <title>Invoice</title>
+    </head>
+    <style>
+
+        .download-invoice-button{
+            background-color: #43bcf8 !important;
+            border: #43bcf8 !important;
+        }
+
+        .download-invoice-button:hover{
+            background-color: #338ab5 !important;
+            border: #338ab5 !important; 
+        }
+
+        .download-receipt-button{
+            background-color: #4abe88 !important;
+            border: #4abe88 !important;
+        }
+
+        .download-receipt-button:hover{
+            background-color: #33825d !important;
+            border: #33825d !important;
+        }
+   
+        .table{
+            width: 100%;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        th{
+            cursor: pointer;
+        }
+
+        .table th,
+        .table td{
+            padding: 8px;
+        }
+
+        .table th{
+            background-color: #21486c;
+            color: #ffffff;
+        }
+
+        .download-invoice-container{
+            text-align: right;
+        }
+
+        .edit-invoice-container{
+            text-align: right;
+        }
+
+    </style>
+
+    <body>
+        <br>
+        <div>
+            <h5><b>Invoice</b></h5>
+
+            {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% endif %}
+
+            <br>
+            <div class="download-invoice-container">
+                {% if invoice.invoice_file %}
+                <a href="{{ invoice.invoice_file.url }}" target="_blank" class="btn btn-primary download-invoice-button" style="margin-right: 10px;">Download Invoice PDF</a>
+                {% else %}
+                    <a class="btn btn-primary download-invoice-button" style="margin-right: 10px;">Download Invoice PDF</a>
+                {% endif %}
+                {% if receipt.receipt_pdf_sent %}
+                <a href="{{ receipt.receipt_pdf_sent.url }}" target="_blank" class="btn btn-primary download-receipt-button">Download Receipt PDF</a>
+                {% else %}
+                <a class="btn btn-primary download-receipt-button">Download Receipt PDF</a>
+                {% endif %}
+            </div>
+            <br><br>
+
+
+
+            <br>
+            <div class="row justify-content-end">
+                <h6 class="col-auto"><b>Invoice No:</b> {{ invoice.invoice_no }}</h6>
+            </div>
+
+            <div class="row justify-content-end">
+                <h6 class="col-auto"><b>Date:</b> {{ invoice.created_at|date:"d/m/Y" }}</h6>
+            </div>
+
+            <br><br>
+            <div class="row justify-content-between">
+                <div class="col">
+                    <h6><b>From:</b>
+                        <br><br>
+                        Berry Group Sdn Bhd
+                        <br>
+                        Unit 7.8, Kompleks Komersil Akasa Jalan Akasa,
+                        <br>
+                        Akasa Cheras Selatan, 43300,
+                        <br>
+                        Cheras, Selangor.
+                    </h6>
+                </div>
+                <div class="col-auto">
+                    <h6><b>To:</b>
+                        <br><br>
+                        {{ student.user.full_name }}
+                        <br>
+                        {{ student.user.phone_no }}
+                    </h6>
+                </div>
+            </div>
+           
+        </div>
+
+        <br>
+        <table id="invoice_table" class="table custom-table">
+            <thead>
+                <tr>
+                    <th>
+                        <span>No.</span>
+                    </th>
+                    <th>
+                        <span>
+                            Description
+                        </span>
+                    </th>
+                    <th>
+                        <span>
+                            Amount (RM)
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for classes in active_classes_enrolled %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ classes.tuition_classes.tuition_class_name }}</td>
+                    <td>{{ classes.tuition_classes.monthly_fee }}</td>
+                </tr>
+                {% endfor %}
+
+                <!--Display additional invoice items-->
+                {% for item in additional_items %}
+                <tr>
+                    <td>{{ forloop.counter|add:active_classes_enrolled.count }}</td>
+                    <td>{{ item.invoice_item_description }}</td>
+                    <td>{{ item.amount }}</td>
+                </tr>
+                {% endfor %}
+
+                <!--Add the total amount row with background colour-->
+                <tr style="background-color: #cce5ff;">
+                    <td colspan="2" style="text-align: right;"><b>Total Amount:</b></td>
+                    <td><b>{{ total_amount }}</b></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br><br>
+        <div>
+            <h6>
+                <h6><b>Remarks:</b></h6>
+                <br>
+                <h6>Please make the payment via Touch 'n Go' or online transfer or through cash deposit to</h6>
+                <h6>BERRY GROUP SDN BHD</h6>
+                <h6>CIMB BANK - 123456789</h6>
+            </h6>
+            
+            <br><br>
+            <h6>
+                <h6><b>Terms and Conditions:</b></h6>
+                <br>
+                <h6>1. Please make the payment before the due date.</h6>
+                <h6>2. We will be closed on Public Holidays and during Berry Online Holidays. There will be no replacement class when off on Public Holidays and Berry Online Holidays.</h6>
+            </h6>
+        </div>
+        
+    </body>
+
+    <script>
+        // Function to hide the success message after a delay
+        function hideSuccessMessage() {
+            var successMessage = document.querySelector(".alert-success");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 3000); // Adjust the delay (in milliseconds) as needed (e.g., 5000ms = 5 seconds)
+            }
+        }
+        // Call the hideSuccessMessage function when the page loads
+        window.onload = hideSuccessMessage;
+
+    </script>
+</html>
+
+{% endblock %}

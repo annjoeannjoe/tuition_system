@@ -159,8 +159,8 @@
             <td>{{ user.email }}</td>
             <td>{{ user.phone_no }}</td>
             <td class="action-buttons">
-              <a href="{%url 'edit_admin_detail' pk=user.id %}" class="btn btn-primary edit-button" title="Edit User"><i class="fas fa-edit"></i></a>
-              <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}" title="Delete User"><i class="fas fa-trash"></i></button>
+              <a href="{%url 'edit_admin_detail' pk=user.id %}" class="btn btn-primary edit-button" title="Edit Admin"><i class="fas fa-edit"></i></a>
+              <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}" title="Delete Admin"><i class="fas fa-trash"></i></button>
             </td>
         </tr>
           {% endif %}

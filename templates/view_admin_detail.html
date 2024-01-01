@@ -40,7 +40,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 20px;  
+            margin-left: auto;  
         }
 
         .delete-button{
@@ -83,7 +83,13 @@
             </ul>
             <div class="tab-content">
                 <div id="tab1" class="tab-pane fade show active">
-                    <br>
+              
+                    <div class="containerbutton">
+                        <!--<a href="{% url 'admin_list_view' %}" class="btn btn-secondary back-button">Back</a>-->
+                        <a href="{%url 'edit_admin_detail' pk=user.id %}" class="btn btn-primary edit-button">Edit</a>
+                        <!--<button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ admin.id }}">Delete</button>-->
+                    </div>  
+                 
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token%}
                         {% if messages %}
@@ -127,12 +133,9 @@
                             <br>
                         </div>
             
-                        <div class="containerbutton">
-                            <a href="{% url 'admin_list_view' %}" class="btn btn-secondary back-button">Back</a>
-                            <a href="{%url 'edit_admin_detail' pk=user.id %}" class="btn btn-primary edit-button">Edit</a>
-                            <button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ admin.id }}">Delete</button>
-                        </div>  
+                        
                     </form> 
+                    <br>
 
                     <!-- Delete Confirmation Modal -->
                     <div class="modal fade" id="deleteModal{{ admin.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -156,6 +159,7 @@
                 </div>
             </div>
         </div>
+        
         
     </body>
 </html>

@@ -135,18 +135,18 @@ class Student (models.Model):
 class Admin (models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class Announcement (models.Model):
+class Announcement(models.Model):
     TARGETED_GROUPS = (
-        ('','Select targeted group'),
         ('ALL', 'All Users'),
         ('ADMIN', 'Administrators'),
         ('STUDENT', 'Students'),
     )
-    targeted_group = models.CharField(max_length=20, choices=TARGETED_GROUPS, null=True)
+    targeted_group = models.CharField(max_length=20, choices=TARGETED_GROUPS, default='ALL')
     announcement_title = models.CharField(max_length=255, null=True)
     announcement_content = models.TextField()
-    announcement_posted_by = models.ForeignKey(Admin, on_delete=models.CASCADE) # using admin_id
+    announcement_posted_by = models.ForeignKey(Admin, on_delete=models.CASCADE, null=True, blank=True)
     announcement_posted_at = models.DateTimeField(auto_now_add=True)
+
  
 class Tuition_Classes(models.Model):
     tuition_class_name = models.CharField(max_length=100)
@@ -216,6 +216,7 @@ class Calendar_Events(models.Model):
     end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated_at = models.DateTimeField(auto_now_add=True)
+    posted_by = models.ForeignKey(Admin, on_delete=models.CASCADE, null=True, blank=True)
 
 class Subject_Evaluation(models.Model):
     subject_evaluation_content = models.TextField()
@@ -223,3 +224,32 @@ class Subject_Evaluation(models.Model):
     student = models.ForeignKey(Student, on_delete = models.CASCADE)
     tuition_classes = models.ForeignKey(Tuition_Classes, on_delete = models.CASCADE)
     
+class Invoices(models.Model):
+    STATUS_CHOICES = (
+        ('Unpaid', 'Unpaid'),
+        ('Paid', 'Paid'),
+        ('Overdue', 'Overdue'),
+        ('Cancelled', 'Cancelled')
+    )
+
+    invoice_no = models.CharField(max_length=20)
+    amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=None)
+    invoice_file = models.FileField(upload_to='invoice_file/')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Unpaid')
+    is_deleted = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    overdue_at = models.DateTimeField(null=True, blank=True)
+    receipt_file = models.FileField(upload_to='receipt_file/', null=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+
+class Invoices_Items(models.Model):
+    amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, default=None)
+    invoice_item_description = models.CharField(max_length=255)
+    invoice = models.ForeignKey(Invoices, on_delete=models.CASCADE) 
+
+class Receipts(models.Model):
+    receipt_no = models.CharField(max_length=20)
+    receipt_pdf_sent = models.FileField(upload_to = 'receipt_pdf_sent/', null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    invoice = models.ForeignKey(Invoices, on_delete=models.CASCADE)

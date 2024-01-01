@@ -93,6 +93,11 @@
                         <span>Enrolment Status</span>
                     </th>
                     <th>
+                        <span>
+                            Request Type
+                        </span>
+                    </th>
+                    <th>
                         <span>Request Status</span>
                     </th>
                     <th>
@@ -109,6 +114,7 @@
                     </td>
                     <td>{{ request.tuition_classes.subject}}</td>
                     <td>Every {{ request.tuition_classes.weekly_day}} {{ request.tuition_classes.general_start_time }} to {{ request.tuition_classes.general_end_time }}</td>
+                    <td>{{ request.request_type }}</td>
                     <td>{{ request.enrolment_status }}</td>
                     <td>
                         {% if request.request_status == 'Accepted' %}

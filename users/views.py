@@ -2,14 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, PasswordResetForm, SetPasswordForm
-from .models import User, Student, Admin, Announcement, Tuition_Classes, Enrolment, Calendar_Events, Subject_Evaluation
+from .models import User, Student, Admin, Announcement, Tuition_Classes, Enrolment, Calendar_Events, Subject_Evaluation, Invoices, Invoices_Items, Receipts
 from django.contrib.auth.hashers import make_password,check_password
 from datetime import datetime
 from django.contrib.auth import update_session_auth_hash, logout as auth_logout, get_user_model
 from django.views.decorators.cache import cache_control
 from django.urls import reverse
 from django.db.models import Q, Count
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from django.utils.timezone import make_aware
 from django.utils import timezone
 import os,re
-from django.http import JsonResponse, HttpResponse, FileResponse
+from django.http import JsonResponse, HttpResponse, FileResponse, Http404
 from django.core.paginator import Paginator
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, landscape
@@ -35,6 +35,13 @@ import plotly.graph_objects as go
 from django.db.models.functions import TruncMonth
 from django.db.models import Count, Case, When, Value, CharField
 from collections import defaultdict
+from django.core.exceptions import ObjectDoesNotExist
+from io import BytesIO
+from django.conf import settings
+from os.path import basename
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.core.files.base import ContentFile
 
 def register (request):
     # Fetch all subjects from the database
@@ -342,7 +349,7 @@ def forgot_password(request):
             User = get_user_model()
             user = User.objects.filter(email=email).first()
             if user:
-                subject = "Password Reset Request"
+                subject = "Django - App Password Reset Request"
 
                 token_generator = PasswordResetTokenGenerator()
                 token = token_generator.make_token(user)
@@ -352,8 +359,8 @@ def forgot_password(request):
                 reset_url = reverse('resetpassword', kwargs={'uidb64': uidb64, 'token': token})
                 reset_url = f"http://{current_site.domain}{reset_url}"
                 
-                message = f"We have received a request to reset the password for your account. To complete the process, click the following link: \n\n {reset_url}"
-                from_email = "annjoe01@hotmail.com" #Change this to your desired sender email
+                message = f"We have received a request to reset the password for your account. To complete the process, click the following link: \n\n {reset_url} \n\nSincerely,\nThe Developer."
+                from_email = settings.DEFAULT_FROM_EMAIL #Change this to your desired sender email
                 send_mail(subject, message, from_email, [email])
                 messages.success(request, "A password reset link has been sent to your email.")
             else:
@@ -396,7 +403,22 @@ def reset_password (request, uidb64, token):
 
 
 def sidebar_student (request):
-    return render (request, "sidebar_student.html")
+    user = request.user
+
+    context= {
+        'user': user
+    }
+    return render (request, "sidebar_student.html", context)
+
+
+
+def sidebar_admin (request):
+    user = request.user
+
+    context={
+        'user':user
+    }
+    return render (request, "sidebar_admin.html", context)
 
 
 @login_required
@@ -427,7 +449,7 @@ def admin_changepassword (request):
             return redirect ('admin_changepassword')
             
         else:
-            messages.error(request, 'Your current password or new password or confirm new password is incorrect. Please try again.')
+            messages.error(request, 'Unable to change. Please check that your current password is correct and ensure the new password and confirm new password match.')
 
     else:
         form = PasswordChangeForm (user=request.user)
@@ -536,8 +558,8 @@ def sidebartest (request):
 
 def admin_student_list (request):
     # Retrieve all Student objects from the database
-    student = Student.objects.all()
-
+    student = Student.objects.filter(is_archived=False)
+    active_tab = request.GET.get('active_tab')
     # Create a paginator object with the queryset and set the number of item per page
     paginator = Paginator(student, 10)
 
@@ -564,7 +586,8 @@ def admin_student_list (request):
         'students': page,
         'page_range': page_range,
         'archived_students': second_page,
-        'page_range_second': page_range_second
+        'page_range_second': page_range_second,
+        'active_tab': active_tab,
     }
     return render (request, 'admin_student_list.html', context)
 
@@ -1223,11 +1246,14 @@ def admin_announcementList(request):
 
 
 def add_announcement(request):
+    
     if request.method == 'POST':
         targeted_group = request.POST.get('targeted_group', None)
         title= request.POST.get('announcement_title', None)
         content = request.POST.get('announcement_content', None)
 
+  
+        announcement_posted_by = request.user.admin_set.first()
         # Check if all required fields are filled
         if targeted_group and title and content:
             # Save the announcement to the database
@@ -1235,7 +1261,7 @@ def add_announcement(request):
                 targeted_group = targeted_group,
                 announcement_title = title,
                 announcement_content = content,
-                announcement_posted_by = request.user
+                announcement_posted_by = announcement_posted_by,
             )
             announcement.save()
             messages.success(request, 'The announcement has been successfully published.')
@@ -1290,6 +1316,15 @@ def calendar_view (request):
 
     return render(request,'calendar.html',context)
 
+def student_calendar(request):
+    all_events = Calendar_Events.objects.all()
+
+    context={
+        'events': all_events,
+    }
+
+    return render(request, 'student_calendar.html', context)
+
 def all_events(request):
     all_events = Calendar_Events.objects.all()
     out = []
@@ -1319,13 +1354,17 @@ def add_event(request):
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
 
+        # Get the currently logged in admin
+        logged_in_admin = request.user.admin_set.first()
+
         # Create a new event object and save it to the database
         event = Calendar_Events(
             event_name = event_name,
             event_type = event_type,
             event_description = event_description,
             start_date = start_date,
-            end_date = end_date
+            end_date = end_date,
+            posted_by = logged_in_admin
         )
         event.save()
 
@@ -2054,8 +2093,52 @@ def create_table_from_enrollments(enrollments):
 
 # Create customised timetable function
 
-def testing(request):
-    return render(request,'testing.html')
+def testing(request, pk):
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+
+    # Retrieve the associated receipt
+    receipt = Receipts.objects.get(invoice-invoice)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt
+    }
+
+    return render(request, 'testing.html', id=pk)
 
 
 def student_timetable (request):
@@ -2435,4 +2518,779 @@ def admin_individual_student_dashboard(request, pk):
     return render(request, 'admin_individual_student_dashboard.html', context)
 
 def admin_payment_status(request):
-    return render(request, 'admin_payment_status.html')
+    invoices = Invoices.objects.all()
+
+    # Extract receipt file names for each invoice
+    for invoice in invoices:
+        invoice.receipt_file_name = os.path.basename(invoice.receipt_file.url) if invoice.receipt_file else None
+
+    context={
+        'invoices': invoices,
+
+        
+    }
+
+    return render(request, 'admin_payment_status.html', context)
+
+def admin_generate_invoice(request, pk):
+    # Retrieve the Student
+    student = get_object_or_404(Student, id=pk)
+
+    # Create a new invoice object
+    invoice = Invoices(student=student, status="Unpaid")  # You should set invoice number if needed
+    
+    # Ensure the student is not archived
+    if not student.is_archived:
+        # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+        add_enrolments = Enrolment.objects.filter(
+            request_type='Add',
+            request_status='Accepted',
+            student=student
+        )
+
+        # Create a list of class IDs for which 'Drop' requests have been accepted
+        drop_classes = set()
+        for enrolment in add_enrolments:
+            drop_enrolment = Enrolment.objects.filter(
+                request_type='Drop',
+                request_status='Accepted',
+                tuition_classes=enrolment.tuition_classes
+            ).first()
+
+            if drop_enrolment:
+                drop_classes.add(enrolment.tuition_classes_id)
+
+        # Get the active classes that are enrolled
+        active_classes_enrolled = add_enrolments.exclude(
+            tuition_classes__id__in=drop_classes,
+        )
+
+        # Retrieve additional invoice items
+        additional_items = Invoices_Items.objects.filter(invoice=invoice)
+
+        # Calculate the total amount for the classes
+        total_amount = 0
+
+        for class_enrolment in active_classes_enrolled:
+            tuition_class = class_enrolment.tuition_classes
+
+            # Check if the amount is not None before adding it
+            if tuition_class.monthly_fee is not None:
+                # Calculate the amount for the class based on the monthly fee
+                amount = tuition_class.monthly_fee
+                total_amount += amount
+
+        for additional_item in additional_items:
+            # Check if the amount is not None before adding it
+            if additional_item.amount is not None:
+                total_amount += additional_item.amount
+        
+        # Generate Invoice Number
+        try:
+            latest_invoice = Invoices.objects.latest('created_at')
+            last_number = int(latest_invoice.invoice_no.split('-')[1])
+            next_number = last_number + 1
+        except Invoices.DoesNotExist:
+            next_number = 1
+
+        invoice_number = f'INV-{next_number:06d}'
+
+         # Create a new invoice object
+        invoice = Invoices(
+            invoice_no = invoice_number,
+            student=student,
+            amount = total_amount, 
+            status="Unpaid"
+        )  # You should set invoice number if needed
+        invoice.save()
+
+        messages.success(request,'The invoice has been successfully generated.')  
+        return redirect('admin_payment_status')
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+    }
+
+    return render(request, 'admin_payment_status.html', context)
+
+def generate_invoice_pdf(pk):
+    try:
+        # Retrieve the invoice using the provided invoice_id
+        invoice = get_object_or_404(Invoices, id=pk)
+
+        # Retrieve existing invoice file, if any
+        existing_invoice_file = invoice.invoice_file
+        try:
+            #Remove existing invoice file, if exists
+            if existing_invoice_file:
+                file_path = os.path.join(settings.MEDIA_ROOT, str(existing_invoice_file))
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+        except Exception as e:
+            print(f"Error removing existing invoice file: {str(e)}")
+        
+        # Retrieve the Student associated with the invoice
+        student = invoice.student
+
+        # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+        add_enrolments = Enrolment.objects.filter(
+            request_type='Add',
+            request_status='Accepted',
+            student=student
+        )
+
+        # Create a list of class IDs for which 'Drop' requests have been accepted
+        drop_classes = set()
+        for enrolment in add_enrolments:
+            drop_enrolment = Enrolment.objects.filter(
+                request_type='Drop',
+                request_status='Accepted',
+                tuition_classes=enrolment.tuition_classes
+            ).first()
+
+            if drop_enrolment:
+                drop_classes.add(enrolment.tuition_classes_id)
+
+        # Get the active classes that are enrolled
+        active_classes_enrolled = add_enrolments.exclude(
+            tuition_classes__id__in=drop_classes,
+        )
+
+        # Retrieve additional invoice items
+        additional_items = Invoices_Items.objects.filter(invoice=invoice)
+
+         # Calculate the total amount
+        total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+        total_amount += sum(additional_item.amount for additional_item in additional_items)
+
+        # Render the HTML content from the template
+        html_content = render_to_string('invoice_pdf.html', {'invoice': invoice, 'student':student, 'active_classes_enrolled': active_classes_enrolled,'additional_items': additional_items, 'total_amount': total_amount})
+
+        # Create the PDF using WeasyPrint
+        pdf_file = HTML(string=html_content).write_pdf()
+
+        # Save the PDF file to the invoice_file attribute
+        invoice.invoice_file.save(f'{invoice.invoice_no}_{student.user.full_name}_Invoice.pdf', ContentFile(pdf_file))
+        # Create the HttpResponse object with the PDF content
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename={invoice.invoice_no}_{invoice.student.user.full_name}_Invoice.pdf'
+        return response
+    
+    except ObjectDoesNotExist:
+        return HttpResponse("Invoice not found")
+
+    
+
+def send_invoice(request, pk):
+
+    # Retrieve the invoice and associated student
+    invoice = get_object_or_404(Invoices, id=pk)
+    student = invoice.student
+
+    # Generate the PDF invoice
+    pdf_content = generate_invoice_pdf(pk) # Pass the invoice ID to generate the invoice_pdf
+
+    # Create an email message
+    subject = f'Invoice for {student.user.full_name}'
+    message = f'Dear {student.user.full_name}, \n\nAttached is the invoice for your recent transactions. Kindly review and proceed with the payment at your earliest convenience. \n\nIf you have any questions, feel free to reach out. \n\nSincerely, \nBerry Group Sdn. Bhd.'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    receipient = [student.user.email]
+
+    # Create an EmailMessage object
+    email = EmailMessage(subject, message, from_email, receipient)
+
+    # Attach the PDF file with a dynamically generated pdf file name
+    pdf_filename = f'{invoice.invoice_no}_{invoice.student.user.full_name}_Invoice.pdf'
+    # Attach the PDF file
+    email.attach(pdf_filename, pdf_content.getvalue(), 'application/pdf') 
+
+    # Send the email
+    email.send()
+
+    messages.success(request,"The invoice has been successfully sent.")
+    return redirect ('admin_payment_status')
+
+def student_invoice(request):
+
+    # Retrieve the logged in user
+    user = request.user
+    student = Student.objects.get(user=user)
+    invoices = Invoices.objects.filter(student=student)
+
+    context={
+        'student': student,
+        'invoices': invoices
+    }
+
+    return render(request,'student_invoice.html', context)
+
+def admin_delete_invoice(request, pk):
+    # Get the invoice to delete
+    invoice_delete = get_object_or_404(Invoices, id=pk)
+
+    # Delete the invoice 
+    invoice_delete.delete()
+
+    messages.success(request, 'The invoice has been successfully deleted.')
+    return redirect('admin_payment_status')
+
+def student_upload_receipt(request, pk):
+    try:
+        receipt = Invoices.objects.get(id=pk)
+    except Invoices.DoesNotExist:
+        raise Http404("Invoice does not exist.")
+    
+    if request.method == 'POST':
+        # receipt = get_object_or_404(Invoices, id=pk)
+        receipt_file = request.FILES.get('uploadReceipt')
+
+        if receipt_file:
+
+            # Check if the file file exists before attempting to remove it
+            if receipt.receipt_file:
+                file_path = os.path.join(settings.MEDIA_ROOT, str(receipt.receipt_file))
+
+                # Check if the file exists before attempting to remove it
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+        invoiceNumber = receipt.invoice_no
+        extension = os.path.splitext(receipt_file.name)[-1]
+        new_filename = f"{invoiceNumber}_Receipt{extension}"
+
+        receipt_file.name = new_filename
+        receipt.receipt_file = receipt_file
+
+        # Update the status to "Pending Verification"
+        receipt.status = "Pending"
+        receipt.save()
+        messages.success(request, "The receipt has been successfully uploaded.")
+    
+    return redirect('student_invoice')
+
+def generate_receipt_pdf(pk, current_date):
+    try:
+        # Retrieve the invoice using the provided invoice_id
+        invoice = get_object_or_404(Invoices, id=pk)
+
+        # Retrieve the existing receipts, if any
+        receipts = Receipts.objects.filter(invoice=invoice)
+
+        # Remove existing receipt files, if they exist
+        for receipt in receipts:
+            if receipt.receipt_pdf_sent:
+                file_path = os.path.join(settings.MEDIA_ROOT, str(receipt.receipt_pdf_sent))
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+        # Retrieve the Student associated with the invoice
+        student = invoice.student
+
+        # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+        add_enrolments = Enrolment.objects.filter(
+            request_type='Add',
+            request_status='Accepted',
+            student=student
+        )
+
+        # Create a list of class IDs for which 'Drop' requests have been accepted
+        drop_classes = set()
+        for enrolment in add_enrolments:
+            drop_enrolment = Enrolment.objects.filter(
+                request_type='Drop',
+                request_status='Accepted',
+                tuition_classes=enrolment.tuition_classes
+            ).first()
+
+            if drop_enrolment:
+                drop_classes.add(enrolment.tuition_classes_id)
+
+        # Get the active classes that are enrolled
+        active_classes_enrolled = add_enrolments.exclude(
+            tuition_classes__id__in=drop_classes,
+        )
+
+        # Retrieve additional invoice items
+        additional_items = Invoices_Items.objects.filter(invoice=invoice)
+        # Calculate the total amount
+        total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+        total_amount += sum(additional_item.amount for additional_item in additional_items)
+        # Generate Receipt Number
+        try:
+            latest_receipt = Receipts.objects.latest('created_at')
+            last_number = int(latest_receipt.receipt_no.split('-')[1])
+            next_number = last_number + 1
+        except Receipts.DoesNotExist:
+            next_number = 1
+
+        latest_receipt_number = f'REC-{next_number:06d}'
+
+        # Render the HTML content from the template
+        html_content = render_to_string('receipt_pdf.html', {'invoice': invoice, 'student':student, 'active_classes_enrolled': active_classes_enrolled,'additional_items':additional_items, 'total_amount': total_amount, 'current_date':current_date, 'receipt_number': latest_receipt_number})
+
+        # Create the PDF using WeasyPrint
+        pdf_file = HTML(string=html_content).write_pdf()
+
+        # Save the PDF file to the invoice_file attribute
+        receipt = Receipts(
+            receipt_no=latest_receipt_number,
+            invoice=invoice,
+        )
+
+        receipt.save()
+        receipt.receipt_pdf_sent.save(f'Receipt_{invoice.invoice_no}_{student.user.full_name}.pdf', ContentFile(pdf_file))
+
+        # Create the HttpResponse object with the PDF content
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename={invoice.invoice_no}_{invoice.student.user.full_name}.pdf'
+        return response
+
+    except ObjectDoesNotExist:
+        return HttpResponse("Receipt not found.")
+
+
+
+def admin_send_receipt(request, pk):
+
+    # Retrieve the invoice and associated student
+    invoice = get_object_or_404(Invoices, id=pk)
+    student = invoice.student
+
+    # Generate the current date
+    current_date = datetime.now().strftime("%d/%m/%Y")
+
+    # Generate the PDF receipt
+    pdf_content = generate_receipt_pdf(pk, current_date)
+
+    # Create an email message
+    subject = f'Receipt for Payment on {invoice.invoice_no}'
+    message = f'Dear {student.user.full_name}, \n\nWe are pleased to inform you that your payment has been received. Attached is the official receipt for your records. \n\nIf you have any enquiries, do not hesitate to contact us. \n\nBest regards,\nBerry Group Sdn Bhd.'
+    from_email = settings.DEFAULT_FROM_EMAIL
+    receipient = [student.user.email]
+
+    # Attach the PDF file with a dynamically generated pdf file name
+    pdf_filename = f'Receipt_{invoice.invoice_no}_{student.user.full_name}.pdf'
+
+    # Create an EmailMessage object
+    email = EmailMessage(subject, message, from_email, receipient)
+
+    # Attach the PDF file
+    email.attach(pdf_filename, pdf_content.getvalue(), 'application/pdf') 
+
+    # Send the email
+    email.send()
+
+    # Update the status to 'Paid'
+    invoice.status = "Paid"
+    invoice.save()
+    
+    messages.success(request,"The receipt has been successfully sent.")
+    return redirect ('admin_payment_status')
+
+def admin_view_invoice_modal(request, pk):
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    context = {
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled
+    }
+
+    return render(request, 'admin_payment_status.html', context)
+
+def invoice(request,pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+     # Retrieve the associated receipt
+    try:
+        receipt = Receipts.objects.filter(invoice=invoice) #original is objects.get after change to objects.filter then the multipleobjectsreturn error solved
+        
+    except Receipts.DoesNotExist:
+        receipt = None  # Handle the case where there is no receipt
+
+    if receipt.exists():
+        # If there are receipts, choose the first one or handle multiple receipts as needed
+        receipt = receipt.first()
+    else:
+        receipt = None  # Handle the case where there is no receipt
+
+  
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Retrieve additional invoice items
+    additional_items = Invoices_Items.objects.filter(invoice=invoice)
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+    total_amount += sum(item.amount for item in additional_items)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt,
+        'additional_items': additional_items
+    }
+
+    return render(request, 'invoice.html', context)
+
+def receipt(request,pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+     # Retrieve the associated receipt
+    try:
+        receipt = Receipts.objects.get(invoice=invoice)
+    except Receipts.DoesNotExist:
+        receipt = None  # Handle the case where there is no receipt
+  
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Retrieve additional invoice items
+    additional_items = Invoices_Items.objects.filter(invoice=invoice)
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+    total_amount += sum(item.amount for item in additional_items)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt,
+        'additional_items': additional_items
+    }
+
+    return render(request, 'receipt.html', context)
+def admin_edit_invoice(request,pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+     # Retrieve the associated receipt
+    try:
+        receipt = Receipts.objects.filter(invoice=invoice)
+    except Receipts.DoesNotExist:
+        receipt = None  # Handle the case where there is no receipt
+  
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt
+    }
+
+    return render(request, 'admin_edit_invoice.html', context)
+
+def admin_add_invoice_item(request, pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+    if request.method == 'POST':
+        invoice_item_description = request.POST['invoice_item_description']
+        amount = request.POST['amount']
+
+        invoice_item = Invoices_Items(
+            invoice_item_description = invoice_item_description,
+            amount = amount,
+            invoice=invoice
+        )
+        invoice_item.save()
+
+        
+
+        messages.success(request, "The invoice item(s) has been successfully added.")
+        return redirect('invoice', pk=pk)
+    
+    context={
+        'invoice': invoice
+    }
+    return (request, 'invoice.html', context)
+
+def invoice_pdf(request,pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+     # Retrieve the associated receipt
+    try:
+        receipt = Receipts.objects.get(invoice=invoice)
+    except Receipts.DoesNotExist:
+        receipt = None  # Handle the case where there is no receipt
+  
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Retrieve additional invoice items
+    additional_items = Invoices_Items.objects.filter(invoice=invoice)
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+    total_amount += sum(item.amount for item in additional_items)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt,
+        'additional_items': additional_items
+    }
+
+    return render(request, 'invoice_pdf.html', context)
+
+def receipt_pdf(request,pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+     # Retrieve the associated receipt
+    try:
+        receipt = Receipts.objects.get(invoice=invoice)
+    except Receipts.DoesNotExist:
+        receipt = None  # Handle the case where there is no receipt
+  
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Retrieve additional invoice items
+    additional_items = Invoices_Items.objects.filter(invoice=invoice)
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+    total_amount += sum(item.amount for item in additional_items)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt,
+        'additional_items': additional_items
+    }
+
+    return render(request, 'receipt_pdf.html', context)
+
+
+def invoice_student_download(request,pk):
+
+    # Retrieve the Invoice
+    invoice = get_object_or_404(Invoices, id=pk)
+
+     # Retrieve the associated receipt
+    try:
+        receipt = Receipts.objects.filter(invoice=invoice) #original is objects.get after change to objects.filter then the multipleobjectsreturn error solved
+        
+    except Receipts.DoesNotExist:
+        receipt = None  # Handle the case where there is no receipt
+
+    if receipt.exists():
+        # If there are receipts, choose the first one or handle multiple receipts as needed
+        receipt = receipt.first()
+    else:
+        receipt = None  # Handle the case where there is no receipt
+
+  
+    # Retrieve the Student associated with the invoice
+    student = invoice.student
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type='Add',
+        request_status='Accepted',
+        student=student
+    )
+
+    # Create a list of class IDs for which 'Drop' requests have been accepted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolment = Enrolment.objects.filter(
+            request_type='Drop',
+            request_status='Accepted',
+            tuition_classes=enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolment:
+            drop_classes.add(enrolment.tuition_classes_id)
+
+    # Get the active classes that are enrolled
+    active_classes_enrolled = add_enrolments.exclude(
+        tuition_classes__id__in=drop_classes,
+    )
+
+    # Retrieve additional invoice items
+    additional_items = Invoices_Items.objects.filter(invoice=invoice)
+    # Calculate the total amount
+    total_amount = sum(class_enrolment.tuition_classes.monthly_fee for class_enrolment in active_classes_enrolled)
+    total_amount += sum(item.amount for item in additional_items)
+
+    context = {
+        'student': student,
+        'invoice': invoice, 
+        'active_classes_enrolled': active_classes_enrolled,
+        'total_amount': total_amount,
+        'receipt': receipt,
+        'additional_items': additional_items
+    }
+
+    return render(request, 'invoice_student_download.html', context)

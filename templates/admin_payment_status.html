@@ -1,4 +1,350 @@
 {% extends 'sidebar_admin.html' %}
 {% block content %}
-HI XIAOYU
+<html>
+    <head>
+        <title>Payment Status</title>
+    </head>
+    <style>
+        
+        .table{
+            width: 100%;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        th{
+            cursor: pointer;
+        }
+
+        .table th,
+        .table td{
+            padding: 8px;
+        }
+
+        .table th{
+            background-color: #21486c;
+            color: #ffffff;
+        }
+
+        .header-wrapper{
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapper span{
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapper i{
+            margin-left: 4px;
+        }
+
+        .badge-lg{
+            font-size: 0.9em;
+            padding: 0.5em 1em;
+            border-radius: 10px;
+        }
+
+        .receipt-button{
+            background-color: #84d192 !important;
+            border-color: #84d192 !important;
+            color: white;
+        }
+
+    </style>
+
+    <body>
+        <br>
+        <h4><b>Payment Management</b></h4>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <br>
+
+        <table id="payment_student_table" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <span>No.</span>
+                    </th>
+                    <th onclick="sortTable(1)">
+                        <div class="header-wrapper">
+                            <span>
+                                Invoice No.
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTable(2)">
+                        <div class="header-wrapper">
+                            <span>
+                                Student Name
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th>
+                        <span>Amount</span>
+                    </th>
+                    <th onclick="sortTable(4)">
+                        <div class="header-wrapper">
+                            <span>
+                                Status
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTable(5)">
+                        <div class="header-wrapper">
+                            <span>
+                                Created At
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th>
+                        <span>Receipt</span>
+                    </th>
+                    <th>
+                        <span>Action</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <a href="{% url 'invoice' invoice.id %}" class="invoice-link">
+                            {{ invoice.invoice_no }}
+                        </a>
+                    </td>
+                    <td>{{ invoice.student.user.full_name }}</td>
+                    <td>RM {{ invoice.amount }}</td>
+                    <td>
+                        {% if invoice.status == 'Unpaid' %}
+                            <span class="badge rounded-pill bg-danger badge-lg">Unpaid</span>
+                        {% elif invoice.status == "Pending" %}
+                            <span class="badge rounded-pill bg-warning badge-lg">Pending</span>
+                        {% elif invoice.status == "Paid" %}
+                            <span class="badge rounded-pill bg-success badge-lg">Paid</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ invoice.created_at|date:"Y-m-d H:i:s" }}</td>
+                    <td>
+                        {% if invoice.receipt_file_name %}
+                            <a href="{{ invoice.receipt_file.url }}" target="_blank">
+                                {{ invoice.receipt_file_name }}
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td class="action-buttons">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sendInvoiceModal{{ invoice.id }}" title="Send Invoice"><i class="fas fa-paper-plane"></i></button>
+                        <span style="margin-right: 10px;"></span>
+                        <button type="button" class="btn btn-primary receipt-button" data-bs-toggle="modal" data-bs-target="#sendReceiptModal{{ invoice.id }}" title="Send Receipt"><i class="fas fa-receipt"></i></button>
+                        <span style="margin-right: 10px;"></span>
+                        <button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteInvoiceModal{{ invoice.id }}"><i class="fas fa-trash"></i></button>
+                    </td>
+
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>    
+
+        <!--Send Invoice Modal-->
+        {% for invoice in invoices %}
+        <div class="modal fade" id="sendInvoiceModal{{ invoice.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><b>Send Invoice</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure want to send invoice with number {{ invoice.invoice_no }} to student with the name of {{ invoice.student.user.full_name }}?              
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>    
+                        <a href="{% url 'send_invoice' invoice.id %}" class="btn btn-primary">Send</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- View Invoice Modal -->
+        {% for invoice in invoices %}
+        <div class="modal fade" id="viewInvoiceModal{{ invoice.id }}" tabindex="-1" role="dialog" aria-labelledby="viewInvoiceModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewInvoiceModalLabel"><b>Invoice Details</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <label for="invoice_number" class="form-label"><b>&nbspInvoice Number</b></label>
+                        <input type="text" class="form-control" id="invoice_number" name="invoice_number" value="{{ invoice.invoice_no }}" autocomplete="off" disabled>
+                       
+                        <br>
+                        <label for="student_name" class="form-label"><b>&nbspStudent Name</b></label>
+                        <input type="text" class="form-control" id="student_name" name="student_name" value="{{ invoice.student.user.full_name }}" autocomplete="off" required>
+
+                        <br>
+                        <label for="total_amount" class="form-label"><b>&nbspAmount (RM)</b></label>
+                        <input type="text" class="form-control" id="total_amount" name="total_amount" value="{{ invoice.amount }}" autocomplete="off" required>
+                       
+                        <br>
+                        <ul class="nav nav-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#invoiceDetails">Invoice Details</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#classesDetails">Drop Class History</a>
+                            </li>
+                        </ul><br>
+                        <div class="tab-content">
+                            <div id="invoiceDetails" class="tab-pane fade show active">
+                                <table id="added_enrolments_table" class="table custom-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <span>Tuition Class Name</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for classes in active_classes_enrolled %}
+                                        <tr>
+                                           <td>{{ classes.tuition_classes.tuition_class_name }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Add footer buttons or additional content if needed -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+
+        <!--Send Receipt Modal-->
+        {% for invoice in invoices %}
+        <div class="modal fade" id="sendReceiptModal{{ invoice.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><b>Send Receipt</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure want to send receipt of invoice {{ invoice.invoice_no }}?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>    
+                        <a href="{% url 'admin_send_receipt' invoice.id %}" class="btn btn-primary">Send</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!--Delete Invoice Modal-->
+        {% for invoice in invoices %}
+        <div class="modal fade" id="deleteInvoiceModal{{ invoice.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><b>Delete Invoice</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure want to delete the invoice with number {{ invoice.invoice_no }}?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <a href="{% url 'admin_delete_invoice' invoice.id %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+      
+    </body>
+
+    <script>
+        // Function to hide the success message after a delay
+        function hideSuccessMessage() {
+            var successMessage = document.querySelector(".alert-success");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 3000); // Adjust the delay (in milliseconds) as needed (e.g., 5000ms = 5 seconds)
+            }
+        }
+        // Call the hideSuccessMessage function when the page loads
+        window.onload = hideSuccessMessage;
+
+        function sortTable(n) {
+          var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+          table = document.getElementById("payment_student_table");
+          switching = true;
+          dir = "asc";
+          
+          while (switching) {
+            switching = false;
+            rows = table.rows;
+            
+            for (i = 1; i < (rows.length - 1); i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("td")[n].textContent.toLowerCase();
+              y = rows[i + 1].getElementsByTagName("td")[n].textContent.toLowerCase();
+              
+              if (dir == "asc") {
+                if (x > y) {
+                  shouldSwitch = true;
+                  break;
+                }
+              } else if (dir == "desc") {
+                if (x < y) {
+                  shouldSwitch = true;
+                  break;
+                }
+              }
+            }
+            
+            if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+              switchcount++;
+            } else {
+              if (switchcount === 0 && dir === "asc") {
+                dir = "desc";
+                switching = true;
+              }
+            }
+          }
+        }
+
+    </script>
+</html>
 {% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'sidebar_student.html' %}
+{% block content %}
+{% load static %}
+<html>
+    <style>
+        .table{
+            width: 100%;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        th{
+            cursor: pointer;
+        }
+
+        .table th,
+        .table td{
+            padding: 8px;
+        }
+
+        .table th{
+            background-color: #21486c;
+            color: #ffffff;
+        }
+
+        .header-wrapper{
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapper span{
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapper i{
+            margin-left: 4px;
+        }
+        
+        .make-payment-container{
+            text-align: right;
+        }
+
+        .badge-lg{
+            font-size: 0.9em;
+            padding: 0.5em 1em;
+            border-radius: 10px;
+        }
+
+
+    </style>
+
+    <body>
+        <br>
+        <h4><b>Invoice</b></h4>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="make-payment-container">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#makePaymentModal">Make Payment</button>
+        </div>
+        
+        <br>
+        <table id="student_invoice_table" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <span>No.</span>
+                    </th>
+                    <th>
+                        <span>Invoice No.</span>
+                    </th>
+                    <th>
+                        <span>Amount</span>
+                    </th>
+                    <th>
+                        <span>Status</span>
+                    </th>
+                    <th>
+                        <span>Created At</span>
+                    </th>
+                    <th>
+                        <span>
+                            Action
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invoice in invoices %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <a href="{% url 'invoice_student_download' invoice.id %}" class="invoice-link">
+                        {{ invoice.invoice_no }}
+                        </a>
+                    </td>
+                    <td>RM {{ invoice.amount }}</td>
+                    <td>
+                        {% if invoice.status == 'Unpaid' %}
+                            <span class="badge rounded-pill bg-danger badge-lg">Unpaid</span>
+                        {% elif invoice.status == "Pending" %}
+                            <span class="badge rounded-pill bg-warning badge-lg">Pending</span>
+                        {% elif invoice.status == "Paid" %}
+                            <span class="badge rounded-pill bg-success badge-lg">Paid</span>
+                        {% endif %}
+                    
+                    </td>
+                    <td>{{ invoice.created_at|date:"Y-m-d H:i:s"}}</td>
+                    <td class="action-buttons">
+                        <button type="button" class="btn btn-primary upload-button" data-bs-toggle="modal" data-bs-target="#uploadReceiptModal{{ invoice.id }}"><i class="fas fa-upload"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!--Make Payment Modal-->
+        <div class="modal fade" id="makePaymentModal" tabindex="-1" aria-label="makePaymentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="makePaymentModalLabel"><b>Make Payment</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 text-center">
+                                <img src="{% static 'images/touchngo_qr.jpg'%}" width="500" height="650">
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <img src="{% static 'images/maybank_qr.jpeg'%}" width="450" height="650">
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Upload Receipt Modal-->
+        {% for invoice in invoices %}
+        <div class="modal fade" id="uploadReceiptModal{{ invoice.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel"><b>Upload Receipt</b></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Kindly upload your receipt for invoice with number {{ invoice.invoice_no }}:
+                        <br><br>
+                        <form method="POST" enctype="multipart/form-data" action="{% url 'student_upload_receipt' invoice.id %}">
+                            {% csrf_token %}
+                            <label for="uploadReceipt" class="form-label"><b>Receipt</b></label>
+                            <input type="file" class="form-control" id="uploadReceipt" name="uploadReceipt" accept="image/*, .pdf" onchange="validateFile('receipt', 'error_message_receipt')">
+                        
+                        
+                        <div id="error_message_receipt" style="color: red;"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </body>
+
+    <script>
+        // Function to hide the success message after a delay
+        function hideSuccessMessage() {
+            var successMessage = document.querySelector(".alert-success");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 3000); // Adjust the delay (in milliseconds) as needed (e.g., 5000ms = 5 seconds)
+            }
+        }
+        // Call the hideSuccessMessage function when the page loads
+        window.onload = hideSuccessMessage;
+
+    </script>
+</html>
+{% endblock %}

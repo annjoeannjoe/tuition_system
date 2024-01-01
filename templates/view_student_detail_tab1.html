@@ -35,7 +35,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-right: 20px;
+        margin-left: auto;
     }
 
     .delete-button{
@@ -63,13 +63,18 @@
 </style>
 
 <body>
-    <br>
+   
                 <form method="POST" enctype="multipart/form-data">
                 {% csrf_token%}
+                <div class="containerbutton">
+                    <!--<a href="{% url 'student_list_view' %}" class="btn btn-secondary back-button">Back</a>-->
+                    <a href="{%url 'edit_student_detail' student.id %}" class="btn btn-primary edit-button">Edit</a>
+                    <!--<button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ student.id }}">Delete</button>-->
+                </div>  
+                    
                 
                 <!-- Wrap only the content in Tab 1 within the container div -->
                 <div class="content-container">
-                    
                     <br>
                     <label for="full_name" class="form-label"><b>&nbspFull Name</b></label><br>
                     <input type="text" class="form-control" id="full_name" name="full_name" value="{{student.user.full_name}}" autocomplete="off" required disabled>
@@ -195,11 +200,7 @@
                     <br>
                 </div>
                 
-                <div class="containerbutton">
-                    <a href="{% url 'student_list_view' %}" class="btn btn-secondary back-button">Back</a>
-                    <a href="{%url 'edit_student_detail' student.id %}" class="btn btn-primary edit-button">Edit</a>
-                    <button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ student.id }}">Delete</button>
-                </div>  
+                
                 </form>
                 
                 <!-- Delete Confirmation Modal -->

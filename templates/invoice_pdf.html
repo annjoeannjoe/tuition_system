@@ -1,4 +1,3 @@
-
 {% block content %}
 
 <html>
@@ -18,6 +17,26 @@
             font-family: "Arial", sans-serif;
         }
 
+        .download-invoice-button{
+            background-color: #43bcf8 !important;
+            border: #43bcf8 !important;
+        }
+
+        .download-invoice-button:hover{
+            background-color: #338ab5 !important;
+            border: #338ab5 !important; 
+        }
+
+        .download-receipt-button{
+            background-color: #4abe88 !important;
+            border: #4abe88 !important;
+        }
+
+        .download-receipt-button:hover{
+            background-color: #33825d !important;
+            border: #33825d !important;
+        }
+   
         .table{
             width: 100%;
             border: 1px solid #ccc;
@@ -37,19 +56,29 @@
             background-color: #21486c;
             color: #ffffff;
         }
+
+        .download-invoice-container{
+            text-align: right;
+        }
+
+        .edit-invoice-container{
+            text-align: right;
+        }
+
     </style>
 
     <body>
         <br>
         <div>
-            <h5><b>Receipt</b></h5>
+            <h5><b>Invoice</b></h5>
+
             <br>
             <div class="row justify-content-end">
-                <h6 class="col-auto"><b>Receipt No:</b> {{ receipt_number }}</h6>
+                <h6 class="col-auto"><b>Invoice No:</b> {{ invoice.invoice_no }}</h6>
             </div>
 
             <div class="row justify-content-end">
-                <h6 class="col-auto"><b>Date:</b> {{ current_date }}</h6>
+                <h6 class="col-auto"><b>Date:</b> {{ invoice.created_at|date:"d/m/Y" }}</h6>
             </div>
 
             <br><br>
@@ -75,7 +104,7 @@
                     </h6>
                 </div>
             </div>
-        
+           
         </div>
 
         <br>
@@ -106,6 +135,15 @@
                 </tr>
                 {% endfor %}
 
+                <!--Display additional invoice items-->
+                {% for item in additional_items %}
+                <tr>
+                    <td>{{ forloop.counter|add:active_classes_enrolled.count }}</td>
+                    <td>{{ item.invoice_item_description }}</td>
+                    <td>{{ item.amount }}</td>
+                </tr>
+                {% endfor %}
+
                 <!--Add the total amount row with background colour-->
                 <tr style="background-color: #cce5ff;">
                     <td colspan="2" style="text-align: right;"><b>Total Amount:</b></td>
@@ -117,14 +155,38 @@
         <br><br>
         <div>
             <h6>
+                <h6><b>Remarks:</b></h6>
+                <br>
+                <h6>Please make the payment via Touch 'n Go' or online transfer or through cash deposit to</h6>
+                <h6>BERRY GROUP SDN BHD</h6>
+                <h6>CIMB BANK - 123456789</h6>
+            </h6>
+            
+            <br><br>
+            <h6>
                 <h6><b>Terms and Conditions:</b></h6>
                 <br>
-                <h6>1. We will be closed on Public Holidays and during Berry Online Holidays. There will be no replacement class when off on Public Holidays and Berry Online Holidays.</h6>
-                <h6>2. Paid fees are NOT refundable and NOT transferable</h6>
-                <h6>3. If there is a fifth week in a month, we will conduct the class as usual, except in the case of a Public Holiday or Berry Online Holiday.</h6>
+                <h6>1. Please make the payment before the due date.</h6>
+                <h6>2. We will be closed on Public Holidays and during Berry Online Holidays. There will be no replacement class when off on Public Holidays and Berry Online Holidays.</h6>
             </h6>
         </div>
         
     </body>
+
+    <script>
+        // Function to hide the success message after a delay
+        function hideSuccessMessage() {
+            var successMessage = document.querySelector(".alert-success");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 3000); // Adjust the delay (in milliseconds) as needed (e.g., 5000ms = 5 seconds)
+            }
+        }
+        // Call the hideSuccessMessage function when the page loads
+        window.onload = hideSuccessMessage;
+
+    </script>
 </html>
+
 {% endblock %}

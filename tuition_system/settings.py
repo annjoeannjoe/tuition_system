@@ -28,8 +28,7 @@ SECRET_KEY = 'django-insecure-m&qj(e^puiaho@b@yh9g!pxe=q0bj4@n7s5#8korfqy2!2-)2=
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'tuitionsystem-5395640e725b.herokuapp.com',
-    'tuitionsystem.me'
+    '127.0.0.1'
 ]
 
 # Application definition
@@ -82,10 +81,10 @@ WSGI_APPLICATION = 'tuition_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'fg29qlulms7ldqhe',
-        'USER': 'b0x8n2dw7yjyhbgo',
-        'PASSWORD': 'truu48blu30zznda',
-        'HOST': 'x71wqc4m22j8e3ql.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        'NAME': 'tuitionsystem_database',
+        'USER': 'root',
+        'PASSWORD': 'development1234#',
+        'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS':{
             'init_command': "SET sql_mode = 'STRICT_TRANS_TABLES'"
@@ -129,10 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
-# STATICFILES_DIRS = [
-#     os.path.join(BASE_DIR, "static")
-# ]
+#STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static")
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -144,12 +143,13 @@ AUTH_USER_MODEL='users.User'
 LOGIN_URL = '/login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 #EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'annjoe01@hotmail.com'
-EMAIL_HOST_PASSWORD = 'angeljoe2001'
+EMAIL_HOST_USER = 'u2005355@siswa.um.edu.my'
+EMAIL_HOST_PASSWORD = 'iijg yecz brpz emkc'
+DEFAULT_FROM_EMAIL = 'u2005355@siswa.um.edu.my'
 
 # Email logging settings
 EMAIL_LOG_BACKEND = 'django.core.mail.backends.console.EmailBackend'

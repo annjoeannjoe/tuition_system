@@ -6,6 +6,11 @@
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+
 <style>
 body {
   font-family: "Lato", sans-serif;
@@ -18,7 +23,7 @@ body {
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #EFEFEF;
+  background-color: #f1f7fd;
   overflow-x: hidden;
   transition: 0.5s;
   padding-top: 60px;
@@ -78,6 +83,151 @@ body {
   outline: none;
 }
 
+.class-dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+  display: block;
+  border: 1px solid #c8e4ff;
+  background-color: #c8e4ff;
+  width: 90%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.class-dropdown-container {
+  display: none;
+  background-color: #dbecfc;
+  padding-left: 8px;
+  /*min-width: 100%;*/
+  border: 1px solid #dbecfc;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.payment-dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+  display: block;
+  border: 1px solid #c8e4ff;
+  background-color: #c8e4ff;
+  width: 90%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.payment-dropdown-container {
+  display: none;
+  background-color: #dbecfc;
+  padding-left: 8px;
+  /*min-width: 100%;*/
+  border: 1px solid #dbecfc;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.enquiry-dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+  display: block;
+  border: 1px solid #c8e4ff;
+  background-color: #c8e4ff;
+  width: 90%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.enquiry-dropdown-container {
+  display: none;
+  background-color: #dbecfc;
+  padding-left: 8px;
+  /*min-width: 100%;*/
+  border: 1px solid #dbecfc;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.myprofile-dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+  display: block;
+  border: 1px solid #c8e4ff;
+  background-color: #c8e4ff;
+  width: 90%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.myprofile-dropdown-container {
+  display: none;
+  background-color: #dbecfc;
+  padding-left: 8px;
+  /*min-width: 100%;*/
+  border: 1px solid #dbecfc;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.setting-dropdown-btn {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 20px;
+  color: black;
+  display: block;
+  border: 1px solid #c8e4ff;
+  background-color: #c8e4ff;
+  width: 90%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.setting-dropdown-container {
+  display: none;
+  background-color: #dbecfc;
+  padding-left: 8px;
+  /*min-width: 100%;*/
+  border: 1px solid #dbecfc;
+  width: 90%;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
   .sidebar {padding-top: 15px;}
@@ -86,25 +236,31 @@ body {
 
 
 /* Add an active class to the active dropdown button */
-.active {
+/*.active {
   background-color: #EFEFEF;
   color: black;
   
-}
+}*/
 
 /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-.dropdown-container {
+/*.dropdown-container {
   display: none;
   background-color: #DADADA;
   padding-left: 8px;
   min-width: 250px;
-}
+}*/
 
 /* Optional: Style the caret down icon */
 .fa-angle-down {
   float: right;
   padding-right: 8px;
-  padding-top: 4px;
+  padding-top: 6px;
+}
+
+.fa-angle-right{
+  float: right;
+  padding-right: 8px;
+  padding-top: 6px;
 }
 
 .enquiry-link{
@@ -135,6 +291,57 @@ body {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
 }
+
+.user-container {
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 90%;
+  margin: 0 auto;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.user-container i {
+  font-size: 36px;
+  margin-right: 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-details {
+  flex-grow: 1;
+}
+
+.user-details p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.user-email {
+  width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-container button{
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #dbecfc !important;
+  border: #dbecfc !important;
+  color: #0f69bc;
+  margin-left: auto;
+}
+
+.user-container button:hover{
+  background-color: #6bb7ff !important;
+  border: #6bb7ff !important;
+}
+
 </style>
 </head>
 <body>
@@ -144,56 +351,101 @@ body {
 <div id="sidebar" class="sidebar">
 
   <a href="javascript:void(0)" class="closeButton" onclick="closeSideBar()">×</a>
+  <br>
+
+  <div class="user-container">
+    <div style="display: flex; align-items: center; margin-left: 5px;">
+      <i class="fas fa-user" style="font-size: 24px; margin-right: 20px;"></i>
+      <div >
+        <p style="margin: 0; font-size: 18px;"><b>{{ user.full_name }}</b></p>
+        <p style="margin: 0; font-size: 16px;">{{ user.role }}</p>
+        <div style="width: 150px; white-space: nowrap; overflow: visible;">
+          <p style="margin: 0; font-size: 14px;">{{ user.email }}</p>
+        </div>
+        
+      </div>
+      
+    </div>
+    <div style="margin: 5px;"></div>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" style="margin-left: 43px;" class="btn btn-primary signout-btn">Sign Out</button>
+    </form>
+
+  </div>
   <br><br>
 
   <!--Class-->
-  <button class="dropdown-btn">
+  <button class="class-dropdown-btn">
     <i class="fas fa-chalkboard" style="padding-right: 15px;"></i>
-    <b>Class</b>
-    <i class="fa fa-angle-down"></i>
+    <b style="font-size: 18px;">Class</b>
+    <i class="fas fa-angle-right"></i>
+    <i class="fas fa-angle-down" style="display: none;"></i>
   </button>
-  <div class="dropdown-container">
-    <a href="{% url 'student_tuition_classes_list' %}">List</a>
-    <a href="{% url 'student_timetable' %}">Timetable</a>
-    <a href="{% url 'student_enrolment_request'%}">Enrolment Request</a>
-    <a href="{% url 'student_announcementList' %}"></i>Announcement</a>
+  <div class="class-dropdown-container">
+    <a href="{% url 'student_tuition_classes_list' %}" style="font-size: 17px;">List</a>
+    <a href="{% url 'student_timetable' %}" style="font-size: 17px;">Timetable</a>
+    <a href="{% url 'student_enrolment_request'%}" style="font-size: 17px;">Enrolment Request</a>
+    <a href="{% url 'student_announcementList' %}" style="font-size: 17px;"></i>Announcement</a>
   </div>
+
+  <div style="margin: 8px;"></div>
 
   <!--Payment-->
-  <button class="dropdown-btn">
+  <button class="payment-dropdown-btn">
     <i class="fas fa-money-check-alt" style="padding-right: 15px;"></i>
-    <b>Payment</b>
-    <i class="fa fa-angle-down"></i>
+    <b style="font-size: 18px;">Payment</b>
+    <i class="fas fa-angle-right"></i>
+    <i class="fas fa-angle-down" style="display: none;"></i>
   </button>
-  <div class="dropdown-container">
-    <a href="#">Invoice</a>
-    <a href="#">Payment History / Receipt</a>
+  <div class="payment-dropdown-container">
+    <a href="{% url 'student_invoice' %}" style="font-size: 17px;">Invoice</a>
+    <!--<a href="#">Payment History / Receipt</a>-->
   </div>
+
+  <div style="margin: 8px;"></div>
 
   <!--Enquiry-->
-  <button class="dropdown-btn">
-    <span><i class="fas fa-question-circle"></i></span>
-    <a href="{% url 'enquiry' %}" style="display: inline-block; padding-right: 10px; margin-left: -10px;"><b>Enquiry</b></a>
-  </button>
-
-
-  
-  <!--My Profile-->
-  <button class="dropdown-btn">
+  <button class="enquiry-dropdown-btn">
     <i class="fas fa-address-card" style="padding-right: 18px;"></i>
-    <b>My Profile</b>
-    <i class="fa fa-angle-down"></i>
+    <b style="font-size: 18px;">Enquiry</b>
+    <i class="fas fa-angle-right"></i>
+    <i class="fas fa-angle-down" style="display: none;"></i>
   </button>
-  <div class="dropdown-container">
-    <a href="{% url 'updateprofile_student' %}">Update Profile</a>
-    <a href="{% url 'student_changepassword' %}">Change Password</a>
+  <div class="enquiry-dropdown-container">
+    <a href="{% url 'enquiry' %}" style="font-size: 17px;">Whatsapp</a>
   </div>
 
-  <!--Logout-->
-  <button class="dropdown-btn">
-    <i class="fas fa-sign-out-alt"></i>
-    <a href="{% url 'logout' %}" style="display: inline-block; padding-right: 10px; margin-left: -10px;"><b>Logout</b></a>
+
+  <div style="margin: 8px;"></div>
+  
+  <!--My Profile-->
+  <button class="myprofile-dropdown-btn">
+    <i class="fas fa-address-card" style="padding-right: 18px;"></i>
+    <b style="font-size: 18px;">My Profile</b>
+    <i class="fas fa-angle-right"></i>
+    <i class="fas fa-angle-down" style="display: none;"></i>
   </button>
+  <div class="myprofile-dropdown-container">
+    <a href="{% url 'updateprofile_student' %}" style="font-size: 17px;">Update Profile</a>
+    <a href="{% url 'student_changepassword' %}" style="font-size: 17px;">Change Password</a>
+  </div>
+  <div style="margin: 8px;"></div>
+
+  <!--Setting-->
+  <button class="setting-dropdown-btn">
+    <i class="fas fa-cogs" style="padding-right: 15px;"></i>
+    <b style="font-size: 18px;">Setting</b>
+    <i class="fas fa-angle-right"></i>
+    <i class="fas fa-angle-down" style="display: none;"></i>
+  </button>
+  <div class="setting-dropdown-container">
+    <!--<a href="#">Shared Classin Account (Tutor)</a>-->
+    <a href="{% url 'student_calendar' %}" style="font-size: 17px;">System Calendar</a>
+  </div>
+  <div style="margin: 15px;"></div>
+
+
  
 </div>
 
@@ -244,13 +496,123 @@ for (i = 0; i < dropdown.length; i++) {
     }
   });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  var dropdownButtons = document.getElementsByClassName("class-dropdown-btn");
+
+  for (var i = 0; i < dropdownButtons.length; i++) {
+    dropdownButtons[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      var rightArrow = this.querySelector(".fa-angle-right");
+      var downArrow = this.querySelector(".fa-angle-down");
+
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+        rightArrow.style.display = "inline";
+        downArrow.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+        rightArrow.style.display = "none";
+        downArrow.style.display = "inline";
+      }
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  var dropdownButtons = document.getElementsByClassName("payment-dropdown-btn");
+
+  for (var i = 0; i < dropdownButtons.length; i++) {
+    dropdownButtons[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      var rightArrow = this.querySelector(".fa-angle-right");
+      var downArrow = this.querySelector(".fa-angle-down");
+
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+        rightArrow.style.display = "inline";
+        downArrow.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+        rightArrow.style.display = "none";
+        downArrow.style.display = "inline";
+      }
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  var dropdownButtons = document.getElementsByClassName("enquiry-dropdown-btn");
+
+  for (var i = 0; i < dropdownButtons.length; i++) {
+    dropdownButtons[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      var rightArrow = this.querySelector(".fa-angle-right");
+      var downArrow = this.querySelector(".fa-angle-down");
+
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+        rightArrow.style.display = "inline";
+        downArrow.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+        rightArrow.style.display = "none";
+        downArrow.style.display = "inline";
+      }
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  var dropdownButtons = document.getElementsByClassName("myprofile-dropdown-btn");
+
+  for (var i = 0; i < dropdownButtons.length; i++) {
+    dropdownButtons[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      var rightArrow = this.querySelector(".fa-angle-right");
+      var downArrow = this.querySelector(".fa-angle-down");
+
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+        rightArrow.style.display = "inline";
+        downArrow.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+        rightArrow.style.display = "none";
+        downArrow.style.display = "inline";
+      }
+    });
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  var dropdownButtons = document.getElementsByClassName("setting-dropdown-btn");
+
+  for (var i = 0; i < dropdownButtons.length; i++) {
+    dropdownButtons[i].addEventListener("click", function () {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      var rightArrow = this.querySelector(".fa-angle-right");
+      var downArrow = this.querySelector(".fa-angle-down");
+
+      if (dropdownContent.style.display === "block") {
+        dropdownContent.style.display = "none";
+        rightArrow.style.display = "inline";
+        downArrow.style.display = "none";
+      } else {
+        dropdownContent.style.display = "block";
+        rightArrow.style.display = "none";
+        downArrow.style.display = "inline";
+      }
+    });
+  }
+});
 </script>
    
 </body>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
 
 </html> 
