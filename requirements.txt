@@ -51,5 +51,6 @@ uritools==4.0.2
 urllib3==2.1.0
 weasyprint==60.1
 webencodings==0.5.1
+whitenoise==6.4.0
 xhtml2pdf==0.2.13
 zopfli==0.2.3
