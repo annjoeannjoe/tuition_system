@@ -29,7 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    'tuitionsystem.me'
+    'tuitionsystem.me',
+    'tuitionsystem-5395640e725b.herokuapp.com'
 ]
 
 # Application definition
