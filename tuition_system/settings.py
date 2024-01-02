@@ -28,7 +28,8 @@ SECRET_KEY = 'django-insecure-m&qj(e^puiaho@b@yh9g!pxe=q0bj4@n7s5#8korfqy2!2-)2=
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '127.0.0.1'
+    '127.0.0.1',
+    'tuitionsystem.me'
 ]
 
 # Application definition
