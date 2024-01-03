@@ -144,11 +144,12 @@ def register (request):
 
         student.startdate = datetime.strptime(request.POST['startdate'], '%Y-%m-%d').date()
         student.classin_phoneno = request.POST['classin_phoneno']
-        phone2_country_code = request.POST['parent_phoneno2_code']
+        student.parent_phoneno2 = request.POST['phoneNo2']
+        #phone2_country_code = request.POST['parent_phoneno2_code']
 
-        phone2_number = request.POST['parent_phoneno2']
-        parent_phoneno2 = f"{phone2_country_code}{phone2_number}"
-        student.parent_phoneno2 = parent_phoneno2
+       #phone2_number = request.POST['parent_phoneno2']
+       #parent_phoneno2 = f"{phone2_country_code}{phone2_number}"
+       #student.parent_phoneno2 = parent_phoneno2
     
 
         # Handle the bankin_receipt uploaded file
