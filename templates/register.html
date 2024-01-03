@@ -1208,6 +1208,18 @@ function checkTimetableConflict(selectedDropdown, errorMessageId, debugMessageId
     }
 }
 
+// Function to hide the success message after a delay
+function hideSuccessMessage() {
+            var successMessage = document.querySelector(".alert-success");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 5000); // Adjust the delay (in milliseconds) as needed (e.g., 5000ms = 5 seconds)
+            }
+        }
+        // Call the hideSuccessMessage function when the page loads
+window.onload = hideSuccessMessage;
+
 
 
 
