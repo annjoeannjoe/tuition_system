@@ -85,7 +85,7 @@
             <div class="tab-content">
                 <div id="tab1" class="tab-pane fade show active">
                     <br>
-                    <form method="POST" id="saveForm"action="{% url 'addnewstudent' %}">
+                    <form method="POST" id="saveStudentForm" action="{% url 'addnewstudent' %}">
                         {% csrf_token%}
                         
                         <div class="content-container">
@@ -442,7 +442,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="margin-right: 10px;">Cancel</button>
-                                <button type="submit" form= "saveForm" class="btn btn-primary">Save</a>
+                                <button type="submit" form= "saveStudentForm" class="btn btn-primary">Save</a>
                             </div>
                         </div>
                     </div>
