@@ -593,69 +593,71 @@ def admin_student_list (request):
     return render (request, 'admin_student_list.html', context)
 
 def addnewstudent (request):
-    # Fetch all subjects from the database
-    subjects = Tuition_Classes.objects.all()
-
-    # Filter unique subjects for Kindergarten level
-    kindergarten_subjects = set()
-    for subject in subjects:
-        if subject.tuition_class_study_level == "Kindergarten":
-            kindergarten_subjects.add(subject.subject)
-
-    primary_subjects = {
-        'sk':{
-            'std1': set(),
-            'std2': set(),
-            'std3': set(),
-            'std4': set(),
-            'std5': set(),
-            'std6': set(),
-        },
-        'sjkc':{
-            'std1': set(),
-            'std2': set(),
-            'std3': set(),
-            'std4': set(),
-            'std5': set(),
-            'std6': set(),
-        }
-    }
-
-    for subject in subjects:
-        if subject.tuition_class_study_level.startswith("Primary"):
-            components = subject.tuition_class_study_level.split()
-            school_type = components[1]
-            primary_level = components[2]
-
-            if school_type == 'sk':
-                primary_subjects['sk'][primary_level].add(subject.subject)
-            elif school_type == 'sjkc':
-                primary_subjects['sjkc'][primary_level].add(subject.subject)
-
-    secondary_subjects = {
-        'form1': set(),
-        'form2': set(),
-        'form3': set(),
-        'form4': set(),
-        'form5': set(),
-    }
-
-    for subject in subjects:
-        if subject.tuition_class_study_level.startswith("Secondary"):
-            components = subject.tuition_class_study_level.split()
-            secondary_level=components[1]
-
-            secondary_subjects[secondary_level].add(subject.subject)
-
-    context = {
-        'subjects': subjects,
-        'kindergarten_subjects': kindergarten_subjects,
-        'primary_subjects': primary_subjects,
-        'secondary_subjects': secondary_subjects,
-
-    }
 
     if request.method == 'POST':
+        # Fetch all subjects from the database
+        subjects = Tuition_Classes.objects.all()
+
+        # Filter unique subjects for Kindergarten level
+        kindergarten_subjects = set()
+        for subject in subjects:
+            if subject.tuition_class_study_level == "Kindergarten":
+                kindergarten_subjects.add(subject.subject)
+
+        primary_subjects = {
+            'sk':{
+                'std1': set(),
+                'std2': set(),
+                'std3': set(),
+                'std4': set(),
+                'std5': set(),
+                'std6': set(),
+            },
+            'sjkc':{
+                'std1': set(),
+                'std2': set(),
+                'std3': set(),
+                'std4': set(),
+                'std5': set(),
+                'std6': set(),
+            }
+        }
+
+        for subject in subjects:
+            if subject.tuition_class_study_level.startswith("Primary"):
+                components = subject.tuition_class_study_level.split()
+                school_type = components[1]
+                primary_level = components[2]
+
+                if school_type == 'sk':
+                    primary_subjects['sk'][primary_level].add(subject.subject)
+                elif school_type == 'sjkc':
+                    primary_subjects['sjkc'][primary_level].add(subject.subject)
+
+        secondary_subjects = {
+            'form1': set(),
+            'form2': set(),
+            'form3': set(),
+            'form4': set(),
+            'form5': set(),
+        }
+
+        for subject in subjects:
+            if subject.tuition_class_study_level.startswith("Secondary"):
+                components = subject.tuition_class_study_level.split()
+                secondary_level=components[1]
+
+                secondary_subjects[secondary_level].add(subject.subject)
+
+        context = {
+            'subjects': subjects,
+            'kindergarten_subjects': kindergarten_subjects,
+            'primary_subjects': primary_subjects,
+            'secondary_subjects': secondary_subjects,
+
+        }
+
+    
         email = request.POST['email']
 
         # Checkif a user with this email already exists
