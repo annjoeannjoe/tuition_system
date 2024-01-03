@@ -85,7 +85,7 @@
             <div class="tab-content">
                 <div id="tab1" class="tab-pane fade show active">
                     <br>
-                    <form method="POST" id="saveStudentForm" action="{% url 'addnewstudent' %}">
+                    <form method="POST" id="saveStudentForm" enctype="multipart/form-data" action="{% url 'addnewstudent' %}">
                         {% csrf_token%}
                         
                         <div class="content-container">
@@ -424,13 +424,13 @@
                             
                         <div class="containerbutton">
                             <a href="{% url 'student_list_view' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Save</button>
+                            <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Save</button>
                         </div>
                     </form>
                 </div>
 
                  <!--Save Confirmation Modal-->
-                <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                <!--<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -446,7 +446,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>-->
                 <div id="tab2" class="tab-pane fade">
                     <br>
                     <div class="content-container">
