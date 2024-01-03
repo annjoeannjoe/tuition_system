@@ -85,7 +85,7 @@
             <div class="tab-content">
                 <div id="tab1" class="tab-pane fade show active">
                     <br>
-                    <form method="POST" action="{% url 'addnewstudent' %}">
+                    <form method="POST" id="saveForm" action="{% url 'addnewstudent' %}">
                         {% csrf_token%}
                         
                         <div class="content-container">
