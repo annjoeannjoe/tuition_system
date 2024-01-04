@@ -38,7 +38,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 20px;
+            margin-left: auto;
         }
 
         .delete-button{
@@ -76,6 +76,13 @@
                     <br>
                     <form method="POST" id="saveForm" enctype="multipart/form-data">
                         {% csrf_token %}
+
+                        <!--Button Container-->
+                        <div class="containerbutton">
+                            <!--<a href="{% url 'admin_tuition_classes_list' %}" class="btn btn-secondary back-button">Back</a>-->
+                            <a href="{% url 'admin_edit_class_detail' pk=tuition_classes.id %}" class="btn btn-primary edit-button">Edit</a>
+                            <!--<button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ tuition_classes.id }}">Delete</button>-->
+                        </div>
             
                         <!--Wrap only the content in Tab 1 within the container div-->
                         <div class="content-container">
@@ -165,12 +172,6 @@
                             <br>
                         </div>
             
-                        <!--Button Container-->
-                        <div class="containerbutton">
-                            <a href="{% url 'admin_tuition_classes_list' %}" class="btn btn-secondary back-button">Back</a>
-                            <a href="{% url 'admin_edit_class_detail' pk=tuition_classes.id %}" class="btn btn-primary edit-button">Edit</a>
-                            <button type="button" class="btn btn-danger delete-button" data-bs-toggle="modal" data-bs-target="#deleteModal{{ tuition_classes.id }}">Delete</button>
-                        </div>
                     </form>
 
                     <!--Delete Confirmation Modal-->
