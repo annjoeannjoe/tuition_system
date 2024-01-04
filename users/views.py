@@ -133,6 +133,7 @@ def register (request):
         #student = Student.objects.get(user_id=id)
 
         student.school_level = request.POST['school_level']
+
         if student.school_level == 'primary':
             student.primary_school_type = request.POST['primary_school_type']
             if student.primary_school_type == 'sk':
