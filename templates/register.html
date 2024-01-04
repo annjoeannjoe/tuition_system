@@ -485,7 +485,7 @@
                                         {% for subject in secondary_subjects.form2 %}
                                         <div class="col-md-4">
                                             <label for="{{ subject }}" class="form-label"><b>{{ subject }}</b></label><br>
-                                            <select name="{{ subject }}" class="form-control form2-timeslot" required onchange="checkTimetableConflict(this,'error_message_timetable', 'debug_message_timetable')">
+                                            <select name="{{ subject }}" class="form-control form2-timeslot" required onchange="checkTimetableConflict(this,'error_message_timetable')">
                                                 <option value="" disabled selected>Select Timeslot</option>
                                                 <option value="0">Not Enrolling</option> <!-- Special value for not enrolling -->
                                                 {% for tuition_class in subjects %}
@@ -1157,7 +1157,7 @@ function extractDayAndTime(timeslot) {
     return { day, startTime, endTime };
 }
 
-function checkTimetableConflict(selectedDropdown, errorMessageId, debugMessageId) {
+function checkTimetableConflict(selectedDropdown, errorMessageId) {
     const selectedTimeslot = selectedDropdown.options[selectedDropdown.selectedIndex].text;
 
     if (selectedTimeslot === 'Not Enrolling') {
