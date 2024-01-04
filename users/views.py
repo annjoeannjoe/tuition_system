@@ -688,8 +688,16 @@ def addnewstudent (request):
         
         student.school_name = request.POST['school_name']
         student.startdate = datetime.strptime(request.POST['startdate'], '%Y-%m-%d').date()
-        
-        # Handle the bankin_receipt uploaded file
+
+
+        student.classin_phoneno = request.POST['classin_phoneno']
+        new_user.phone_no = request.POST['phoneNo'] 
+        student.parent_phoneno2 = request.POST['parent_phoneno2']
+        student.student_phoneno = request.POST['student_phoneno']
+
+        student.student_ic_number = request.POST['student_ic_number']
+       
+         # Handle the bankin_receipt uploaded file
         bankin_receipt = request.FILES.get('bankin_receipt')
         if bankin_receipt:
 
@@ -704,13 +712,9 @@ def addnewstudent (request):
             # Save the uploaded file (bankin_receipt)
             student.bankin_receipt = bankin_receipt
 
-        student.classin_phoneno = request.POST['classin_phoneno']
-        new_user.phone_no = request.POST['phoneNo'] 
-        student.parent_phoneno2 = request.POST['parent_phoneno2']
         student.student_phoneno = request.POST['student_phoneno']
-
         student.student_ic_number = request.POST['student_ic_number']
-       
+
         # Handle the student_ic_photo uploaded file
         ic_photo = request.FILES.get('student_ic_photo')
         if ic_photo:
@@ -740,6 +744,7 @@ def addnewstudent (request):
             
             # Save the uploaded file (student_photo)
             student.student_photo = student_photo
+
         
         new_user.street1 = request.POST['street1']
         new_user.street2 = request.POST['street2']
