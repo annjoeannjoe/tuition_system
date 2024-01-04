@@ -306,6 +306,267 @@ def register (request):
         return redirect(reverse('login'))
     return render (request, "register.html", context)
 
+def addnewstudent (request):
+    # Fetch all subjects from the database
+    subjects = Tuition_Classes.objects.all()
+
+    # Filter unique subjects for Kindergarten level
+    kindergarten_subjects = set()
+    for subject in subjects:
+        if subject.tuition_class_study_level == "Kindergarten":
+            kindergarten_subjects.add(subject.subject)
+
+    primary_subjects = {
+        'sk':{
+            'std1': set(),
+            'std2': set(),
+            'std3': set(),
+            'std4': set(),
+            'std5': set(),
+            'std6': set(),
+        },
+        'sjkc':{
+            'std1': set(),
+            'std2': set(),
+            'std3': set(),
+            'std4': set(),
+            'std5': set(),
+            'std6': set(),
+        }
+    }
+
+    for subject in subjects:
+        if subject.tuition_class_study_level.startswith("Primary"):
+            components = subject.tuition_class_study_level.split()
+            school_type = components[1]
+            primary_level = components[2]
+
+            if school_type == 'sk':
+                primary_subjects['sk'][primary_level].add(subject.subject)
+            elif school_type == 'sjkc':
+                primary_subjects['sjkc'][primary_level].add(subject.subject)
+
+    secondary_subjects = {
+        'form1': set(),
+        'form2': set(),
+        'form3': set(),
+        'form4': set(),
+        'form5': set(),
+    }
+
+    for subject in subjects:
+        if subject.tuition_class_study_level.startswith("Secondary"):
+            components = subject.tuition_class_study_level.split()
+            secondary_level=components[1]
+
+            secondary_subjects[secondary_level].add(subject.subject)
+
+    context = {
+        'subjects': subjects,
+        'kindergarten_subjects': kindergarten_subjects,
+        'primary_subjects': primary_subjects,
+        'secondary_subjects': secondary_subjects,
+
+    }
+
+    if request.method =='POST':
+        email = request.POST['email']
+
+        #check if a user with this email already exists
+        try: 
+            existing_user = User.objects.get(email=email)
+            messages.error(request, 'An account with this email already exists. Please login.')
+            #return render(request, 'login.html', {'message': 'An account with this email already exists. Please login.','email':email})
+
+        except User.DoesNotExist:
+            pass
+
+        # Create a new user object
+        new_user = User()
+        new_user.full_name = request.POST['fullname']
+        new_user.email=email
+        new_user.password = make_password(request.POST['password'])
+        new_user.phone_no = request.POST['phoneNo'] 
+        new_user.role = 'STUDENT' # set all the new user's role as student
+        
+
+        # Create a new student object with user as foreign key
+        student = Student()
+        student.user = new_user
+        #student = Student.objects.get(user_id=id)
+
+        student.school_level = request.POST['school_level']
+        if student.school_level == 'primary':
+            student.primary_school_type = request.POST['primary_school_type']
+            if student.primary_school_type == 'sk':
+                student.sk_level = request.POST['sk_level']
+            elif student.primary_school_type == 'sjkc':
+                student.sjkc_level = request.POST['sjkc_level']
+        elif student.school_level == 'secondary':
+            student.secondary_level = request.POST['secondary_level']
+
+        student.startdate = datetime.strptime(request.POST['startdate'], '%Y-%m-%d').date()
+        student.classin_phoneno = request.POST['classin_phoneno']
+        student.parent_phoneno2 = request.POST['parent_phoneno2']
+        #phone2_country_code = request.POST['parent_phoneno2_code']
+
+       #phone2_number = request.POST['parent_phoneno2']
+       #parent_phoneno2 = f"{phone2_country_code}{phone2_number}"
+       #student.parent_phoneno2 = parent_phoneno2
+    
+
+        # Handle the bankin_receipt uploaded file
+        bankin_receipt = request.FILES.get('bankin_receipt')
+        if bankin_receipt:
+
+            # Generate a new filename based on the user's username
+            username = new_user.full_name
+            extension = os.path.splitext(bankin_receipt.name)[-1]
+            new_filename = f"{username}_BankInReceipt{extension}"
+
+            #Assign the new filename to the uploaded file
+            bankin_receipt.name = new_filename
+            
+            # Save the uploaded file (bankin_receipt)
+            student.bankin_receipt = bankin_receipt
+
+        student.student_phoneno = request.POST['student_phoneno']
+        student.student_ic_number = request.POST['student_ic_number']
+
+        # Handle the student_ic_photo uploaded file
+        ic_photo = request.FILES.get('student_ic_photo')
+        if ic_photo:
+            
+            # Geerate a new filename based on the user's username
+            username = new_user.full_name
+            extension = os.path.splitext(ic_photo.name)[-1]
+            new_filename = f"{username}_IcPhoto{extension}"
+
+            # Assign the new filename to the uploaded file
+            ic_photo.name = new_filename
+
+            # Save the uploaded file (ic_photo)
+            student.student_ic_photo = ic_photo
+
+        # Handle the student_photo uploaded file
+        student_photo = request.FILES.get('student_photo')
+        if student_photo:
+
+            # Generate a new filename based on the user's username
+            username = new_user.full_name
+            extension = os.path.splitext(student_photo.name)[-1]
+            new_filename = f"{username}_StudentPhoto{extension}"
+
+            # Assign the new filename to the uploaded file
+            student_photo.name = new_filename
+            
+            # Save the uploaded file (student_photo)
+            student.student_photo = student_photo
+
+        student.school_name = request.POST['school_name']
+        new_user.street1 = request.POST['street1']
+        new_user.street2 = request.POST['street2']
+        new_user.city = request.POST['city']
+        new_user.postalcode = request.POST['postalcode']
+        new_user.state = request.POST['state']
+
+        # know us from field
+        selected_options=[]
+        if 'facebook' in request.POST:
+            selected_options.append('Facebook')
+        if 'instagram' in request.POST:
+            selected_options.append('Instagram')
+        if 'google' in request.POST:
+            selected_options.append('Google')
+        if 'tiktok' in request.POST:
+            selected_options.append('Tik Tok')
+        if 'friend' in request.POST:
+            selected_options.append('Friend')
+        if 'xhs' in request.POST:
+            selected_options.append('小红书')
+        if 'sibling' in request.POST:
+            selected_options.append('Sibling or Family Member')
+
+        if 'other' in request.POST:
+            other_know_us_from = request.POST.get('displayOther','')
+            if other_know_us_from:
+                selected_options.append(other_know_us_from)
+
+        know_us_from =','.join(selected_options)
+        student.know_us_from = know_us_from
+
+        new_user.save()
+        student.save()
+
+        # Now that user and student attribute are set, create enrolment if applicable
+        if student.school_level == 'kindergarten':
+            for subject in kindergarten_subjects:
+                selected_timeslot_id = request.POST.get(subject)
+                if selected_timeslot_id and selected_timeslot_id != "0": # Check for not enrolling
+                    selected_tuition_class = Tuition_Classes.objects.get(id=selected_timeslot_id)
+                    if selected_tuition_class.tuition_class_study_level == "Kindergarten":
+                        enrolment = Enrolment(
+                            request_type = 'Add',
+                            request_status = 'Pending',
+                            enrolment_status = 'Active',
+                            tuition_classes = selected_tuition_class,
+                            student = student
+                        )
+                        enrolment.save()
+        elif student.school_level == 'primary':
+            student.primary_school_type = request.POST['primary_school_type']
+            if student.primary_school_type == 'sk':
+                student.sk_level = request.POST['sk_level']
+                for primary_level, subjects in primary_subjects['sk'].items():
+                    for subject in subjects:
+                        selected_timeslot_id = request.POST.get(subject)
+                        if selected_timeslot_id and selected_timeslot_id != "0":
+                            selected_tuition_class = Tuition_Classes.objects.get(id = selected_timeslot_id)
+                            if selected_tuition_class.tuition_class_study_level == f"Primary sk {primary_level}":
+                                enrolment = Enrolment(
+                                    request_type = 'Add',
+                                    request_status = 'Pending',
+                                    enrolment_status = 'Active',
+                                    tuition_classes = selected_tuition_class,
+                                    student = student
+                                )
+                                enrolment.save()
+            elif student.primary_school_type == 'sjkc':
+                student.sjkc_level = request.POST['sjkc_level']
+                for primary_level, subjects in primary_subjects['sjkc'].items():
+                    for subject in subjects:
+                        selected_timeslot_id = request.POST.get(subject)
+                        if selected_timeslot_id and selected_timeslot_id != "0":
+                            selected_tuition_class = Tuition_Classes.objects.get(id = selected_timeslot_id)
+                            if selected_tuition_class.tuition_class_study_level == f"Primary sjkc {primary_level}":
+                                enrolment = Enrolment(
+                                    request_type = 'Add',
+                                    request_status = 'Pending',
+                                    enrolment_status = 'Active',
+                                    tuition_classes = selected_tuition_class,
+                                    student = student
+                                )
+                                enrolment.save()
+        elif student.school_level == 'secondary':
+            student.secondary_level = request.POST['secondary_level']
+            for subject in secondary_subjects[student.secondary_level]:
+                selected_timeslot_id = request.POST.get(subject)
+                if selected_timeslot_id and selected_timeslot_id != "0":
+                    selected_tuition_class = Tuition_Classes.objects.get(id=selected_timeslot_id)
+                    if selected_tuition_class.tuition_class_study_level == f"Secondary {student.secondary_level}":
+                        enrolment = Enrolment(
+                            request_type = 'Add',
+                            request_status = 'Pending',
+                            enrolment_status = 'Active',
+                            tuition_classes = selected_tuition_class,
+                            student = student
+                        )
+                        enrolment.save()
+
+        messages.success(request, "New student has successfully added.")
+        return redirect(reverse('student_list_view'))
+    return render (request, "addnewstudent.html", context)
+
 
 
 def login(request):
@@ -592,262 +853,7 @@ def admin_student_list (request):
     }
     return render (request, 'admin_student_list.html', context)
 
-def addnewstudent (request):
-    # Fetch all subjects from the database
-    subjects = Tuition_Classes.objects.all()
 
-    # Filter unique subjects for Kindergarten level
-    kindergarten_subjects = set()
-    for subject in subjects:
-        if subject.tuition_class_study_level == "Kindergarten":
-            kindergarten_subjects.add(subject.subject)
-
-    primary_subjects = {
-        'sk':{
-            'std1': set(),
-            'std2': set(),
-            'std3': set(),
-            'std4': set(),
-            'std5': set(),
-            'std6': set(),
-        },
-        'sjkc':{
-            'std1': set(),
-            'std2': set(),
-            'std3': set(),
-            'std4': set(),
-            'std5': set(),
-            'std6': set(),
-        }
-    }
-
-    for subject in subjects:
-        if subject.tuition_class_study_level.startswith("Primary"):
-            components = subject.tuition_class_study_level.split()
-            school_type = components[1]
-            primary_level = components[2]
-
-            if school_type == 'sk':
-                primary_subjects['sk'][primary_level].add(subject.subject)
-            elif school_type == 'sjkc':
-                primary_subjects['sjkc'][primary_level].add(subject.subject)
-
-    secondary_subjects = {
-        'form1': set(),
-        'form2': set(),
-        'form3': set(),
-        'form4': set(),
-        'form5': set(),
-    }
-
-    for subject in subjects:
-        if subject.tuition_class_study_level.startswith("Secondary"):
-            components = subject.tuition_class_study_level.split()
-            secondary_level=components[1]
-
-            secondary_subjects[secondary_level].add(subject.subject)
-
-    context = {
-        'subjects': subjects,
-        'kindergarten_subjects': kindergarten_subjects,
-        'primary_subjects': primary_subjects,
-        'secondary_subjects': secondary_subjects,
-
-    }
-
-    if request.method == 'POST':
-        email = request.POST['email']
-
-        # Checkif a user with this email already exists
-        try: 
-            existing_user = User.objects.get(email=email)
-            messages.error(request, 'An account with this email already exists. Please login.')
-            return render (request,'addnewstudent.html', {'message':'An account with this email already exists. Please choose a different email.'})
-        except User.DoesNotExist:
-            pass
-
-         # Create a new user object
-        new_user = User()
-        new_user.full_name = request.POST['fullname']
-        new_user.email=email
-        new_user.password = make_password(request.POST['password'])
-        new_user.role = 'STUDENT' # set all the new user's role as student
-        # Create a new student object with user as foreign key
-        student = Student()
-        student.user = new_user
-
-        student.school_level = request.POST['school_level']
-        if student.school_level == 'primary':
-            student.primary_school_type = request.POST['primary_school_type']
-            if student.primary_school_type == 'sk':
-                student.sk_level = request.POST['sk_level']
-            elif student.primary_school_type == 'sjkc':
-                student.sjkc_level = request.POST['sjkc_level']
-        elif student.school_level == 'secondary':
-            student.secondary_level = request.POST['secondary_level']
-        
-        student.school_name = request.POST['school_name']
-        student.startdate = datetime.strptime(request.POST['startdate'], '%Y-%m-%d').date()
-
-
-        student.classin_phoneno = request.POST['classin_phoneno']
-        new_user.phone_no = request.POST['phoneNo'] 
-        student.parent_phoneno2 = request.POST['parent_phoneno2']
-        student.student_phoneno = request.POST['student_phoneno']
-
-        student.student_ic_number = request.POST['student_ic_number']
-       
-         # Handle the bankin_receipt uploaded file
-        bankin_receipt = request.FILES.get('bankin_receipt')
-        if bankin_receipt:
-
-            # Generate a new filename based on the user's username
-            username = new_user.full_name
-            extension = os.path.splitext(bankin_receipt.name)[-1]
-            new_filename = f"{username}_BankInReceipt{extension}"
-
-            #Assign the new filename to the uploaded file
-            bankin_receipt.name = new_filename
-            
-            # Save the uploaded file (bankin_receipt)
-            student.bankin_receipt = bankin_receipt
-
-        student.student_phoneno = request.POST['student_phoneno']
-        student.student_ic_number = request.POST['student_ic_number']
-
-        # Handle the student_ic_photo uploaded file
-        ic_photo = request.FILES.get('student_ic_photo')
-        if ic_photo:
-            
-            # Geerate a new filename based on the user's username
-            username = new_user.full_name
-            extension = os.path.splitext(ic_photo.name)[-1]
-            new_filename = f"{username}_IcPhoto{extension}"
-
-            # Assign the new filename to the uploaded file
-            ic_photo.name = new_filename
-
-            # Save the uploaded file (ic_photo)
-            student.student_ic_photo = ic_photo
-
-        # Handle the student_photo uploaded file
-        student_photo = request.FILES.get('student_photo')
-        if student_photo:
-
-            # Generate a new filename based on the user's username
-            username = new_user.full_name
-            extension = os.path.splitext(student_photo.name)[-1]
-            new_filename = f"{username}_StudentPhoto{extension}"
-
-            # Assign the new filename to the uploaded file
-            student_photo.name = new_filename
-            
-            # Save the uploaded file (student_photo)
-            student.student_photo = student_photo
-
-        
-        new_user.street1 = request.POST['street1']
-        new_user.street2 = request.POST['street2']
-        new_user.city = request.POST['city']
-        new_user.postalcode = request.POST['postalcode']
-        new_user.state = request.POST['state']
-
-        # know us from field
-        selected_options=[]
-        if 'facebook' in request.POST:
-            selected_options.append('Facebook')
-        if 'instagram' in request.POST:
-            selected_options.append('Instagram')
-        if 'google' in request.POST:
-            selected_options.append('Google')
-        if 'tiktok' in request.POST:
-            selected_options.append('Tik Tok')
-        if 'friend' in request.POST:
-            selected_options.append('Friend')
-        if 'xhs' in request.POST:
-            selected_options.append('小红书')
-        if 'sibling' in request.POST:
-            selected_options.append('Sibling or Family Member')
-
-        if 'other' in request.POST:
-            other_know_us_from = request.POST.get('displayOther','')
-            if other_know_us_from:
-                selected_options.append(other_know_us_from)
-
-        know_us_from =','.join(selected_options)
-        student.know_us_from = know_us_from
-        
-        new_user.save()
-        student.save()
-
-        # Now that user and student attribute are set, create enrolment if applicable
-        if student.school_level == 'kindergarten':
-            for subject in kindergarten_subjects:
-                selected_timeslot_id = request.POST.get(subject)
-                if selected_timeslot_id and selected_timeslot_id != "0": # Check for not enrolling
-                    selected_tuition_class = Tuition_Classes.objects.get(id=selected_timeslot_id)
-                    if selected_tuition_class.tuition_class_study_level == "Kindergarten":
-                        enrolment = Enrolment(
-                            request_type = 'Add',
-                            request_status = 'Pending',
-                            enrolment_status = 'Active',
-                            tuition_classes = selected_tuition_class,
-                            student = student
-                        )
-                        enrolment.save()
-        elif student.school_level == 'primary':
-            student.primary_school_type = request.POST['primary_school_type']
-            if student.primary_school_type == 'sk':
-                student.sk_level = request.POST['sk_level']
-                for primary_level, subjects in primary_subjects['sk'].items():
-                    for subject in subjects:
-                        selected_timeslot_id = request.POST.get(subject)
-                        if selected_timeslot_id and selected_timeslot_id != "0":
-                            selected_tuition_class = Tuition_Classes.objects.get(id = selected_timeslot_id)
-                            if selected_tuition_class.tuition_class_study_level == f"Primary sk {primary_level}":
-                                enrolment = Enrolment(
-                                    request_type = 'Add',
-                                    request_status = 'Pending',
-                                    enrolment_status = 'Active',
-                                    tuition_classes = selected_tuition_class,
-                                    student = student
-                                )
-                                enrolment.save()
-            elif student.primary_school_type == 'sjkc':
-                student.sjkc_level = request.POST['sjkc_level']
-                for primary_level, subjects in primary_subjects['sjkc'].items():
-                    for subject in subjects:
-                        selected_timeslot_id = request.POST.get(subject)
-                        if selected_timeslot_id and selected_timeslot_id != "0":
-                            selected_tuition_class = Tuition_Classes.objects.get(id = selected_timeslot_id)
-                            if selected_tuition_class.tuition_class_study_level == f"Primary sjkc {primary_level}":
-                                enrolment = Enrolment(
-                                    request_type = 'Add',
-                                    request_status = 'Pending',
-                                    enrolment_status = 'Active',
-                                    tuition_classes = selected_tuition_class,
-                                    student = student
-                                )
-                                enrolment.save()
-        elif student.school_level == 'secondary':
-            student.secondary_level = request.POST['secondary_level']
-            for subject in secondary_subjects[student.secondary_level]:
-                selected_timeslot_id = request.POST.get(subject)
-                if selected_timeslot_id and selected_timeslot_id != "0":
-                    selected_tuition_class = Tuition_Classes.objects.get(id=selected_timeslot_id)
-                    if selected_tuition_class.tuition_class_study_level == f"Secondary {student.secondary_level}":
-                        enrolment = Enrolment(
-                            request_type = 'Add',
-                            request_status = 'Pending',
-                            enrolment_status = 'Active',
-                            tuition_classes = selected_tuition_class,
-                            student = student
-                        )
-                        enrolment.save()
-
-        messages.success(request, "New student has successfully added.")
-        return redirect('student_list_view')
-    return render (request, "addnewstudent.html", context)
 
 def view_student_detail (request,pk):
     student = get_object_or_404(Student, pk=pk)
