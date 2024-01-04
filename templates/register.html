@@ -1205,6 +1205,10 @@ function checkTimetableConflict(selectedDropdown, errorMessageId) {
         }, 3000);
     } else {
         document.getElementById(errorMessageId).innerText = '';
+        setTimeout(function(){
+            document.getElementById(errorMessageId).innerText = '';
+            document.getElementById(debugMessageId).innerHTML = '';
+        }, 3000);
     }
 }
 
