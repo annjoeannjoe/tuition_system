@@ -196,7 +196,7 @@
                                     </select><br>
                                 </div>
    
-                                <!--<div id="kindergarten_timetable" style="display: none;">
+                                <div id="kindergarten_timetable" style="display: none;">
                                     <img src="{% static 'images/kindergarten_timetable.png' %}" width="600" height="225"><br><br>
                                     <div class="row">
                                         {% for subject in kindergarten_subjects %}
@@ -204,8 +204,8 @@
                                                 <label for="{{ subject }}" class="form-label"><b>{{ subject }}</b></label><br>
                                                 <select name="{{ subject }}" class="form-control">
                                                     <option value="" disabled selected>Select Timeslot</option>
-                                                    <option value="0">Not Enrolling</option> --><!-- Special value for not enrolling -->
-                                                   <!-- {% for tuition_class in subjects %}
+                                                    <option value="0">Not Enrolling</option> <!-- Special value for not enrolling -->
+                                                    {% for tuition_class in subjects %}
                                                         {% if tuition_class.subject == subject and tuition_class.tuition_class_study_level == "Kindergarten" %}
                                                             <option value="{{ tuition_class.id }}">{{ tuition_class.tuition_class_name }} {{ tuition_class.weekly_day }} {{ tuition_class.general_start_time }} - {{ tuition_class.general_end_time }}</option>
                                                         {% endif %}
@@ -215,7 +215,7 @@
                                         {% endfor %}
                                     </div>
                                     <br>
-                                </div>-->
+                                </div>
    
                                 <div id="sk_std1_timetable" style="display: none;">
                                     <img src="{% static 'images/primary_sk_std1_timetable.png' %}" width="600" height="225"><br><br>
