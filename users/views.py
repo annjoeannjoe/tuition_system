@@ -595,7 +595,7 @@ def login(request):
                         messages.error(request, "Sorry, your student account has been archived.")
                         return render(request, 'login.html')
                     else:
-                        return redirect('student_tuition_classes_list')  # Redirect to the student dashboard
+                        return redirect('student_tuition_classes_list') # Redirect to the student dashboard
                 except Student.DoesNotExist:
                     messages.error(request, 'Student account not found.')
                     return render(request, 'login.html')
