@@ -1221,7 +1221,7 @@ def delete_admin(request, pk):
     user = get_object_or_404(User, id=pk, role='ADMIN')
 
     # Delete the associated user object
-    user.delete()
+    user.soft_delete()
     return redirect('admin_list_view')
 
 @login_required
