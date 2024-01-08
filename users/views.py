@@ -1684,7 +1684,7 @@ def student_delete_enrolment_request(request, request_id):
 def admin_tuition_classes_list(request):
 
     # Retrieve tuition classes with its respective data
-    tuition_classes = Tuition_Classes.objects.filter(is_archived=False).order_by('created_at')
+    tuition_classes = Tuition_Classes.objects.filter(is_archived=False, deleted=False).order_by('created_at')
 
     # Retrieve the active tab parameter from the query string
     active_tab = request.GET.get('active_tab')
@@ -1794,7 +1794,7 @@ def admin_delete_tuition_class(request, pk):
     tuition_classes = get_object_or_404(Tuition_Classes, id=pk)
 
     # Delete the enrolment request
-    tuition_classes.delete()
+    tuition_classes.soft_delete()
 
     messages.success(request,'The class(es)have been successfully deleted.')
 

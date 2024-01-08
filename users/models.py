@@ -187,6 +187,10 @@ class Tuition_Classes(models.Model):
     archived_at = models.DateTimeField(null=True, blank=True)
     unarchived_at = models.DateTimeField(null=True, blank=True)
     admin = models.ForeignKey(Admin, on_delete=models.CASCADE)
+    deleted = models.BooleanField(default=False)
+    def soft_delete(self):
+        self.deleted = True
+        self.save()
 
 class Enrolment (models.Model):
     REQUEST_CHOICES =(
