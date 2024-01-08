@@ -589,12 +589,16 @@ def login(request):
         if check_password(password, user.password):  # Use check_password for secure comparison
             auth.login(request, user)
             if user.role == 'STUDENT':
-                student = Student.objects(user-user)
-                if student.is_archived:
-                    messages.error(request, "Sorry, your student account has been archived.")
-                    return render (request,'login.html')
-                else:
-                    return redirect('student_tuition_classes_list')  # Redirect to the student dashboard
+                try:
+                    student = Student.objects.get(user=user)
+                    if student.is_archived:
+                        messages.error(request, "Sorry, your student account has been archived.")
+                        return render(request, 'login.html')
+                    else:
+                        return redirect('student_tuition_classes_list')  # Redirect to the student dashboard
+                except Student.DoesNotExist:
+                    messages.error(request, 'Student account not found.')
+                    return render(request, 'login.html')
             elif user.role == 'SUPER ADMIN' or user.role == 'ADMIN':
                 return redirect('admin_class_dashboard')
             else:
