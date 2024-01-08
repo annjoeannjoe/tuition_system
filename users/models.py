@@ -131,6 +131,14 @@ class Student (models.Model):
     is_archived = models.BooleanField(default=False)
     archived_at = models.DateTimeField(null=True, blank=True)
     unarchived_at = models.DateTimeField(null=True, blank=True)
+    deleted = models.BooleanField(default=False)
+    def soft_delete(self):
+        self.deleted = True
+        self.save()
+
+        # solf delete the associated user
+        self.user.deleted = True
+        self.user.save()
 
 class Admin (models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
