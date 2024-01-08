@@ -1794,7 +1794,7 @@ def admin_delete_tuition_class(request, pk):
     tuition_classes = get_object_or_404(Tuition_Classes, id=pk)
 
     # Delete the enrolment request
-    tuition_classes.soft_delete()
+    tuition_classes.delete()
 
     messages.success(request,'The class(es)have been successfully deleted.')
 
