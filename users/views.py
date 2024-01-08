@@ -1144,7 +1144,7 @@ def event_detail(request):
 @login_required
 def admin_list_view (request):
     #Retrieve all User objects with the role 'ADMIN' from the database
-    admins = User.objects.filter(role='ADMIN').order_by('created_at')
+    admins = User.objects.filter(role='ADMIN', deleted=False).order_by('created_at')
 
     # Create a paginator object with the queryset and set the number of items per page
     paginator = Paginator(admins,10)
