@@ -1222,6 +1222,7 @@ def delete_admin(request, pk):
 
     # Delete the associated user object
     user.soft_delete()
+    
     return redirect('admin_list_view')
 
 @login_required

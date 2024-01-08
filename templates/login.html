@@ -179,6 +179,15 @@
                 icon.classList.add("fa-eye-slash");
             }
         }
+
+        function hideSuccessMessage() {
+            var successMessage = document.querySelector(".alert-success");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 2500); // Adjust the delay (in milliseconds) as needed (e.g., 5000ms = 5 seconds)
+            }
+        }
     </script> 
 </html>
 
