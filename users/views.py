@@ -589,7 +589,12 @@ def login(request):
         if check_password(password, user.password):  # Use check_password for secure comparison
             auth.login(request, user)
             if user.role == 'STUDENT':
-                return redirect('student_tuition_classes_list')  # Redirect to the student dashboard
+                student = Student.objects(user-user)
+                if student.is_archived:
+                    messages.error(request, "Sorry, your student account has been archived.")
+                    return render (request,'login.html')
+                else:
+                    return redirect('student_tuition_classes_list')  # Redirect to the student dashboard
             elif user.role == 'SUPER ADMIN' or user.role == 'ADMIN':
                 return redirect('admin_class_dashboard')
             else:
@@ -1222,7 +1227,7 @@ def delete_admin(request, pk):
 
     # Delete the associated user object
     user.soft_delete()
-    
+
     return redirect('admin_list_view')
 
 @login_required
