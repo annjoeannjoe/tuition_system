@@ -1120,7 +1120,7 @@ def delete_student(request, pk):
     #Retrieve the student object
     student = get_object_or_404(Student, id=pk)
 
-    # Delete the associated user object
+    # Soft delete the associated user object
     student.soft_delete()
     return redirect('student_list_view')
 
