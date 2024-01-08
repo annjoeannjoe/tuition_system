@@ -577,6 +577,11 @@ def login(request):
 
         try:
             user = User.objects.get(email=email)
+
+            if user.deleted:
+                messages.error(request, "Sorry, you are not allowed to login.")
+                return render(request,'login.html')
+
         except User.DoesNotExist:
             messages.error(request, 'Account with this email does not exist. Please sign up.')
             return render(request, 'login.html')
