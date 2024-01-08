@@ -66,6 +66,11 @@ class User (AbstractUser):
           #  return not (self.reset_token_expiration < timezone.now())
         #return False
     
+    deleted = models.BooleanField(default=False)
+    def soft_delete(self):
+        self.deleted = True
+        self.save()
+    
 class Student (models.Model):
     #indicate foreign key
     user= models.ForeignKey(User, on_delete=models.CASCADE)
