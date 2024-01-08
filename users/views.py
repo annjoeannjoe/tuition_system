@@ -821,7 +821,7 @@ def sidebartest (request):
 
 def admin_student_list (request):
     # Retrieve all Student objects from the database
-    student = Student.objects.filter(is_archived=False)
+    student = Student.objects.filter(is_archived=False, deleted=False)
     active_tab = request.GET.get('active_tab')
     # Create a paginator object with the queryset and set the number of item per page
     paginator = Paginator(student, 10)
