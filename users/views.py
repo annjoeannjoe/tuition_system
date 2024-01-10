@@ -1173,23 +1173,23 @@ def view_admin_detail (request,pk):
     return render (request, 'view_admin_detail.html', {'admin_user': admin_user})
 
 def edit_admin_detail(request,pk):
-    user = get_object_or_404(User, id=pk, role='ADMIN')
+    admin_user = get_object_or_404(User, id=pk, role='ADMIN')
 
     if request.method == "POST":
-        user.full_name = request.POST['full_name']
+        admin_user.full_name = request.POST['full_name']
         
-        user.phone_no = request.POST['phoneNo']
-        user.street1 = request.POST['street1']
-        user.street2 = request.POST['street2']
-        user.city = request.POST['city']
-        user.postalcode = request.POST['postalcode']
-        user.state = request.POST['state']
-        user.save()
+        admin_user.phone_no = request.POST['phoneNo']
+        admin_user.street1 = request.POST['street1']
+        admin_user.street2 = request.POST['street2']
+        admin_user.city = request.POST['city']
+        admin_user.postalcode = request.POST['postalcode']
+        admin_user.state = request.POST['state']
+        admin_user.save()
 
         messages.success(request,'The changes have been successfully updated.')
-        return redirect ('edit_admin_detail', pk=user.id)
+        return redirect ('edit_admin_detail', pk=admin_user.id)
     
-    return render (request, 'edit_admin_detail.html', {'user': user})
+    return render (request, 'edit_admin_detail.html', {'admin_user': admin_user})
 
 def addnewadmin (request):
     if request.method == 'POST':

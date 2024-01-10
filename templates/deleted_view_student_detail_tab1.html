@@ -66,7 +66,8 @@
    
                 <form method="POST" enctype="multipart/form-data">
                 {% csrf_token%}
-              
+                <br>
+                
                 <!-- Wrap only the content in Tab 1 within the container div -->
                 <div class="content-container">
                     <br>
@@ -197,7 +198,24 @@
                 
                 </form>
                 
-              
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal{{ student.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete Student</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete the student with the name "{{ student.user.full_name }}"?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <a href="{% url 'delete_student' pk=student.id %}" class="btn btn-danger">Delete</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 </body>
 <script>

@@ -83,38 +83,38 @@
                         <div class="content-container">
                             <br>
                             <label for="full_name" class="form-label"><b>&nbspFull Name</b></label><br>
-                            <input type="text" class="form-control" id="full_name" name="full_name" value="{{user.full_name}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="full_name" name="full_name" value="{{admin_user.full_name}}" autocomplete="off" required>
                             
                             <br>
                             <label for="email" class="form-label"><b>&nbspEmail</b></label>
-                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="{{user.email}}" autocomplete="off" disabled>
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" value="{{admin_user.email}}" autocomplete="off" disabled>
                 
                             <br>
                             <label for="phoneNo" class="form-label"><b>&nbspPhone No.</b></label>
-                            <input type="text" class="form-control" id="phoneNo" name="phoneNo" value="{{user.phone_no}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="phoneNo" name="phoneNo" value="{{admin_user.phone_no}}" autocomplete="off" required>
                             
                             <br><br> 
                             <label for="adminhomeaddress" class="form-label"><b>&nbspHome Address</b></label>
                             <br>
                             <label for="street1" class="form-label"><b>&nbspStreet 1</b></label>
-                            <input type="text" class="form-control" id="street1" name="street1" value="{{user.street1}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="street1" name="street1" value="{{admin_user.street1}}" autocomplete="off" required>
                             <br>
                             <label for="street2" class="form-label"><b>&nbspStreet 2</b></label>
-                            <input type="text" class="form-control" id="street2" name="street2" value="{{user.street2}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="street2" name="street2" value="{{admin_user.street2}}" autocomplete="off" required>
                             <br>
                             <label for="city" class="form-label"><b>&nbspCity</b></label>
-                            <input type="text" class="form-control" id="city" name="city" value="{{user.city}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="city" name="city" value="{{admin_user.city}}" autocomplete="off" required>
                             <br>
                             <label for="postalcode" class="form-label"><b>&nbspPostal Code</b></label>
-                            <input type="text" class="form-control" id="postalcode" name="postalcode" value="{{user.postalcode}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="postalcode" name="postalcode" value="{{admin_user.postalcode}}" autocomplete="off" required>
                             <br>
                             <label for="state" class="form-label"><b>&nbspState</b></label>
-                            <input type="text" class="form-control" id="state" name="state" value="{{user.state}}" autocomplete="off" required>
+                            <input type="text" class="form-control" id="state" name="state" value="{{admin_user.state}}" autocomplete="off" required>
                             <br>
                         </div>
             
                         <div class="containerbutton">
-                            <a href="{% url 'view_admin_detail' pk=user.id %}" class="btn btn-secondary">Cancel</a>
+                            <a href="{% url 'view_admin_detail' pk=admin_user.id %}" class="btn btn-secondary">Cancel</a>
                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Save</button>
                         </div>
                     </form> 
