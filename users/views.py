@@ -3350,9 +3350,9 @@ def admin_deleted_records (request):
 
 
     context = {
-        'deleted_student': page,
+        'deleted_admin': page,
+        'deleted_student': deleted_student,
         'page_range': page_range,
-        'deleted_admin': deleted_admin,
         #'class': deleted_class,
         'active_tab': active_tab,
     }
