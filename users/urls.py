@@ -96,4 +96,5 @@ urlpatterns = [
    path('deleted_student_records/', views.deleted_student_records, name="deleted_student_records"),
    path('deleted_viewadmindetails/<int:pk>/', views.deleted_view_admin_detail, name="deleted_view_admin_detail"),
    path('deleted_viewstudentdetails/<int:pk>/', views.deleted_view_student_detail, name="deleted_view_student_detail"),
+   path('deleted_view_class_detail/<int:pk>/',views.deleted_view_class_detail, name="deleted_view_class_detail"),
 ]  

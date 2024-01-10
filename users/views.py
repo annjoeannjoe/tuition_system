@@ -1169,8 +1169,8 @@ def admin_list_view (request):
     return render (request, 'admin_list_view.html', context)
 
 def view_admin_detail (request,pk):
-    user = get_object_or_404(User, pk=pk, role='ADMIN')
-    return render (request, 'view_admin_detail.html', {'user': user})
+    admin_user = get_object_or_404(User, pk=pk, role='ADMIN')
+    return render (request, 'view_admin_detail.html', {'admin_user': admin_user})
 
 def edit_admin_detail(request,pk):
     user = get_object_or_404(User, id=pk, role='ADMIN')
@@ -3456,3 +3456,14 @@ def deleted_view_student_detail (request,pk):
         'active_tab': active_tab,
     }
     return render (request, 'deleted_view_student_detail.html', context)
+
+
+
+def deleted_view_class_detail(request,pk):
+    tuition_classes = get_object_or_404(Tuition_Classes, id=pk)
+
+    context={
+        'tuition_classes': tuition_classes,
+    }
+
+    return render(request,'deleted_view_class_detail.html',context)
