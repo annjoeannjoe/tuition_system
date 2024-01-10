@@ -523,7 +523,7 @@
                                 <div id="form2_timetable" style="display: none;">
                                     <div class="row">
                                         {% for subject in secondary_subjects.form2 %}
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label for="{{ subject }}" class="form-label"><b>{{ subject }}</b></label><br>
                                             <select name="{{ subject }}" class="form-control form2-timeslot" required onchange="checkTimetableConflict(this,'error_message_timetable')">
                                                 <option value="" disabled selected>Select Timeslot</option>
@@ -1233,68 +1233,68 @@
         }
 
         function extractDayAndTime(timeslot) {
-    const dayAndTime = timeslot.match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s(\d{1,2}:\d{2}\s[apm.]+)\s-\s(\d{1,2}:\d{2}\s[apm.]+)/);
-    const day = dayAndTime[1];
-    const startTime = dayAndTime[2];
-    const endTime = dayAndTime[3];
+            const dayAndTime = timeslot.match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s(\d{1,2}:\d{2}\s[apm.]+)\s-\s(\d{1,2}:\d{2}\s[apm.]+)/);
+            const day = dayAndTime[1];
+            const startTime = dayAndTime[2];
+            const endTime = dayAndTime[3];
 
-    return { day, startTime, endTime };
-}
+            return { day, startTime, endTime };
+        }
 
-function checkTimetableConflict(selectedDropdown, errorMessageId) {
-    const selectedTimeslot = selectedDropdown.options[selectedDropdown.selectedIndex].text;
+        function checkTimetableConflict(selectedDropdown, errorMessageId) {
+            const selectedTimeslot = selectedDropdown.options[selectedDropdown.selectedIndex].text;
 
-    if (selectedTimeslot === 'Not Enrolling') {
-        document.getElementById(errorMessageId).innerText = '';
-        document.getElementById(debugMessageId).innerHTML = '';
-        return;
-    }
+            if (selectedTimeslot === 'Not Enrolling') {
+                document.getElementById(errorMessageId).innerText = '';
+                document.getElementById(debugMessageId).innerHTML = '';
+                return;
+            }
 
-    const { day: selectedDay, startTime: selectedStartTime, endTime: selectedEndTime } = extractDayAndTime(selectedTimeslot);
+            const { day: selectedDay, startTime: selectedStartTime, endTime: selectedEndTime } = extractDayAndTime(selectedTimeslot);
 
-    let debugInfo = '';
-    const selectedSubject = selectedDropdown.name;
-    let conflictFound = false;
+            let debugInfo = '';
+            const selectedSubject = selectedDropdown.name;
+            let conflictFound = false;
 
-    const previouslySelected = document.querySelectorAll('.form-control.form2-timeslot:not([name="' + selectedSubject + '"])');
+            const previouslySelected = document.querySelectorAll('.form-control.form2-timeslot:not([name="' + selectedSubject + '"])');
 
-    previouslySelected.forEach(function(subject) {
-        const otherSelectedTimeslot = subject.options[subject.selectedIndex].text;
+            previouslySelected.forEach(function(subject) {
+                const otherSelectedTimeslot = subject.options[subject.selectedIndex].text;
 
-        if (otherSelectedTimeslot !== 'Select Timeslot' && otherSelectedTimeslot !== 'Not Enrolling') {
-            const { day: otherDay, startTime: otherStartTime, endTime: otherEndTime } = extractDayAndTime(otherSelectedTimeslot);
+                if (otherSelectedTimeslot !== 'Select Timeslot' && otherSelectedTimeslot !== 'Not Enrolling') {
+                    const { day: otherDay, startTime: otherStartTime, endTime: otherEndTime } = extractDayAndTime(otherSelectedTimeslot);
 
-            debugInfo += 'Selected Timeslot: ' + selectedDay + ' ' + selectedStartTime + ' - ' + selectedEndTime + '<br>';
-            debugInfo += 'Other Timeslot: ' + otherDay + ' ' + otherStartTime + ' - ' + otherEndTime + '<br>';
+                    debugInfo += 'Selected Timeslot: ' + selectedDay + ' ' + selectedStartTime + ' - ' + selectedEndTime + '<br>';
+                    debugInfo += 'Other Timeslot: ' + otherDay + ' ' + otherStartTime + ' - ' + otherEndTime + '<br>';
 
-            // Check for conflicts considering overlapping time ranges on the same day
-            if (
-                (selectedStartTime >= otherStartTime && selectedStartTime < otherEndTime && selectedDay === otherDay) ||
-                (selectedEndTime > otherStartTime && selectedEndTime <= otherEndTime && selectedDay === otherDay) ||
-                (selectedStartTime <= otherStartTime && selectedEndTime >= otherEndTime && selectedDay === otherDay)
-            ) {
-                conflictFound = true;
-                debugInfo += 'Conflict found between ' + selectedTimeslot + ' and ' + otherSelectedTimeslot + '<br>';
+                    // Check for conflicts considering overlapping time ranges on the same day
+                    if (
+                        (selectedStartTime >= otherStartTime && selectedStartTime < otherEndTime && selectedDay === otherDay) ||
+                        (selectedEndTime > otherStartTime && selectedEndTime <= otherEndTime && selectedDay === otherDay) ||
+                        (selectedStartTime <= otherStartTime && selectedEndTime >= otherEndTime && selectedDay === otherDay)
+                    ) {
+                        conflictFound = true;
+                        debugInfo += 'Conflict found between ' + selectedTimeslot + ' and ' + otherSelectedTimeslot + '<br>';
+                    }
+                }
+            });
+
+            if (conflictFound) {
+                document.getElementById(errorMessageId).innerText = 'Conflicting timeslots selected. Please choose non-conflicting timeslots.';
+                document.getElementById(debugMessageId).innerHTML = debugInfo; // Display debug information
+                // Clear debug info after 10 seconds
+                setTimeout(function(){
+                    document.getElementById(errorMessageId).innerText = '';
+                    document.getElementById(debugMessageId).innerHTML = '';
+                }, 5000);
+            } else {
+                document.getElementById(errorMessageId).innerText = '';
+                setTimeout(function(){
+                    document.getElementById(errorMessageId).innerText = '';
+                    document.getElementById(debugMessageId).innerHTML = '';
+                }, 5000);
             }
         }
-    });
-
-    if (conflictFound) {
-        document.getElementById(errorMessageId).innerText = 'Conflicting timeslots selected. Please choose non-conflicting timeslots.';
-        document.getElementById(debugMessageId).innerHTML = debugInfo; // Display debug information
-        // Clear debug info after 10 seconds
-        setTimeout(function(){
-            document.getElementById(errorMessageId).innerText = '';
-            document.getElementById(debugMessageId).innerHTML = '';
-        }, 5000);
-    } else {
-        document.getElementById(errorMessageId).innerText = '';
-        setTimeout(function(){
-            document.getElementById(errorMessageId).innerText = '';
-            document.getElementById(debugMessageId).innerHTML = '';
-        }, 5000);
-    }
-}
     </script>
 </html>
 
