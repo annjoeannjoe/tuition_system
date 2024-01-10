@@ -29,20 +29,20 @@
             color: #FFFFFF;
         }
 
-        .student_fullname{
+        .classname{
             color: #333;
         }
 
-        .student_fullname a{
+        .classname a{
             color: #6A76FF;
             text-decoration: none;
         }
 
-        .student_fullname a:hover{
+        .classname a:hover{
             color: #1650e1;
         }
 
-        .student_rows:hover{
+        .class_rows:hover{
             background-color: #e4e4e4;
         }
 
@@ -65,31 +65,39 @@
 
     <body>
         <br>
-        <table id="deleted_student_records" class="table custom-table">
+        <table id="deleted_class_records" class="table custom-table">
             <thead>
-                <tr class="student_rows">
+                <tr class="class_rows">
                     <th><span>No.</span></th>
-                    <th onclick="sortTableTab2(1)">
+                    <th onclick="sortTableTab3(1)">
                         <div class="header-wrapper">
                             <span>
-                                Name
+                                Class Name
                                 <i class="fas fa-sort" style="margin-left: 10px;"></i>
                             </span>
                         </div>
                     </th>
-                    <th onclick="sortTableTab2(2)">
+                    <th onclick="sortTableTab3(2)">
                         <div class="header-wrapper">
                             <span>
-                                Email
+                                Subject Taught
                                 <i class="fas fa-sort" style="margin-left: 10px;"></i>
                             </span>
                         </div>
                     </th>
                     <th><span>Phone No.</span></th>
-                    <th onclick="sortTableTab2(4)">
+                    <th onclick="sortTableTab3(4)">
                         <div class="header-wrapper">
                             <span>
-                                School Name
+                                Study Level
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTableTab3(5)">
+                        <div class="header-wrapper">
+                            <span>
+                                Class Time
                                 <i class="fas fa-sort" style="margin-left: 10px;"></i>
                             </span>
                         </div>
@@ -97,10 +105,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for student in deleted_student %}         
+                {% for classes in deleted_class %}         
                     <tr class="deleted_admin_rows">
                         <td>{{ student.start_index|add:forloop.counter0 }}</td>
-                        <td class="student_fullname"><a href="{% url 'view_student_detail' student.id %}">{{ student.user.full_name }}</a></td>
+                        <td class="classname"><a href="{% url 'admin_view_class_detail' classes.id%}">{{ student.user.full_name }}</a></td>
                         <td>{{ student.user.email }}</td>
                         <td>{{ student.user.phone_no }}</td>
                         <td>{{ student.school_name }}</td>
@@ -110,46 +118,46 @@
             </tbody>
         </table>
 
-        <!-- Second Pagination Block -->
-   <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-end">
-            {% if deleted_student.has_previous %}
-            <li class="page-item">
-                <a class="page-link" href="?second_page=1&active_tab=tab2">First</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?second_page={{ deleted_student.previous_page_number }}&active_tab=tab2">Previous</a>
-            </li>
-            {% endif %}
+        <!-- third Pagination Block -->
+        <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end">
+                    {% if deleted_class.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?third_page=1&active_tab=tab3">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?third_page={{ deleted_class.previous_page_number }}&active_tab=tab3">Previous</a>
+                    </li>
+                    {% endif %}
 
-            {% for i in page_range_second %}
-                {% if i == deleted_student.number %}
-                <li class="page-item active">
-                    <span class="page-link">{{ i }}</span>
-                </li>
-                {% else %}
-                <li class="page-item">
-                    <a class="page-link" href="?second_page={{ i }}&active_tab=tab2">{{ i }}</a>
-                </li>
-                {% endif %}
-            {% endfor %}
+                    {% for i in page_range_third %}
+                        {% if i == deleted_class.number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ i }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?third_page={{ i }}&active_tab=tab3">{{ i }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
 
-            {% if deleted_student.has_next %}
-            <li class="page-item">
-                <a class="page-link" href="?second_page={{ deleted_student.next_page_number }}&active_tab=tab2">Next</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="?second_page={{ deleted_student.paginator.num_pages }}&active_tab=tab2">Last</a>
-            </li>
-            {% endif %}
-        </ul>
-    </nav>
+                    {% if deleted_class.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?third_page={{ deleted_class.next_page_number }}&active_tab=tab3">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?third_page={{ deleted_class.paginator.num_pages }}&active_tab=tab3">Last</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
 
     </body>
     <script>
-        function sortTableTab2(n) {
+        function sortTableTab3(n) {
           var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-          table = document.getElementById("deleted_student_records");
+          table = document.getElementById("deleted_class_records");
           switching = true;
           dir = "asc";
           

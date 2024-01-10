@@ -3340,33 +3340,28 @@ def admin_deleted_records (request):
 
      # Retrieve all Student objects from the database
     deleted_student = Student.objects.filter(deleted=True)
-    second_paginator = Paginator(deleted_student, 1)
+    second_paginator = Paginator(deleted_student, 10)
     second_page_number = request.GET.get('second_page')
     second_page = second_paginator.get_page(second_page_number)
     max_pages_second = second_paginator.num_pages
     current_page_second = second_page.number
     page_range_second = range(max(1, current_page_second - 2), min(max_pages_second, current_page_second + 2) + 1)
 
-
-
-
-
-    #Retrieve all User objects with the role 'ADMIN' from the database
-    deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
-
-    #deleted_class = Tuition_Classes.objects.filter(deleted=True)
+    deleted_class = Tuition_Classes.objects.filter(deleted=True)
+    third_paginator = Paginator(deleted_class, 1)
+    third_page_number = request.GET.get('third_page')
+    third_page = third_paginator.get_page(third_page_number)
+    max_pages_third = third_paginator.num_pages
+    current_page_third = third_page.number
+    page_range_third = range(max(1, current_page_third - 2), min(max_pages_third, current_page_third + 2) + 1)
     
-
-   
-
-
     context = {
         'deleted_admin': page,
         'page_range': page_range,
         'deleted_student': second_page,
         'page_range_second': page_range_second,
-        
-        #'class': deleted_class,
+        'deleted_class': third_page,
+        'page_range_third': page_range_third,
         'active_tab': active_tab,
     }
     return render (request, 'admin_deleted_records.html', context)
