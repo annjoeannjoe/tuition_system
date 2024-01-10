@@ -3381,8 +3381,8 @@ def deleted_student_records(request):
     return render(request, 'deleted_student_records.html')
 
 def deleted_view_admin_detail (request,pk):
-    user = get_object_or_404(User, pk=pk, role='ADMIN')
-    return render (request, 'deleted_view_admin_detail.html', {'user': user})
+    admin_user = get_object_or_404(User, pk=pk, role='ADMIN')
+    return render (request, 'deleted_view_admin_detail.html', {'admin_user': admin_user})
 
 
 
