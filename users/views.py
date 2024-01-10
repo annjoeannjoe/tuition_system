@@ -3331,7 +3331,7 @@ def admin_deleted_records (request):
 
     # Retrieve all Student objects from the database
     deleted_student = Student.objects.filter(deleted=True)
-    paginator = Paginator(deleted_student, 10)
+    paginator = Paginator(deleted_student, 2)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     max_pages = paginator.num_pages
