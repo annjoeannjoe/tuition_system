@@ -3328,17 +3328,17 @@ def invoice_student_download(request,pk):
 
 def admin_deleted_records (request):
     # Retrieve all Student objects from the database
-    #deleted_student = Student.objects.filter(deleted=True)
+    deleted_student = Student.objects.filter(deleted=True)
        
     #Retrieve all User objects with the role 'ADMIN' from the database
-    #deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
+    deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
 
     #deleted_class = Tuition_Classes.objects.filter(deleted=True)
     active_tab = request.GET.get('active_tab')
 
     context = {
-        #'student': deleted_student,
-        #'admin': deleted_admin,
+        'deleted_student': deleted_student,
+        'deleted_admin': deleted_admin,
         #'class': deleted_class,
         'active_tab': active_tab,
     }
@@ -3348,8 +3348,12 @@ def deleted_admin_records (request):
     deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
 
     context={
-        'student': deleted_admin,
+        'deleted_admin': deleted_admin,
     }
 
     return render (request, 'deleted_admin_records.html', context)
 
+
+def deleted_student_records(request):
+
+    return render(request, 'deleted_student_records.html')

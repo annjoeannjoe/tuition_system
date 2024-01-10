@@ -10,7 +10,9 @@
     </head>
 
     <style>
-
+        .tab-pane{
+            background-color: #FFFFFF;
+        }
     </style>
 
     <body>
@@ -27,7 +29,7 @@
         <div class="container mt-5">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav link active" data-bs-toggle="tab" href="#tab1">Deleted Admin Record(s)</a>
+                    <a class="nav-link active" data-bs-toggle="tab" href="#tab1">Deleted Admin Record(s)</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="tab" href="#tab2">Deleted Student Record(s)</a>
@@ -36,6 +38,9 @@
             <div class="tab-content">
                 <div id="tab1" class="tab-pane fade show active">
                     {% include 'deleted_admin_records.html' %}
+                </div>
+                <div id="tab2" class="tab-pane fade">
+                    {% include 'deleted_student_records.html' %}
                 </div>
             </div>
         </div>

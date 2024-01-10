@@ -93,4 +93,5 @@ urlpatterns = [
    path('invoice_student_download/<int:pk>/', views.invoice_student_download, name="invoice_student_download"),
    path('admin_deleted_records/', views.admin_deleted_records, name="admin_deleted_records"),
    path('deleted_admin_records/', views.deleted_admin_records, name="deleted_admin_records"),
+   path('deleted_student_records/', views.deleted_student_records, name="deleted_student_records"),
 ]  

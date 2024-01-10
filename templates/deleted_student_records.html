@@ -20,16 +20,18 @@
                     <th><span>Name</span></th>
                     <th><span>Email</span></th>
                     <th><span>Phone No.</span></th>
+                    <th><span>School Name</span></th>
                 </tr>
             </thead>
             <tbody>
-                {% for admin in deleted_admin %}
+                {% for student in deleted_student %}
                   
                     <tr class="deleted_admin_rows">
-                        <td>{{ admin.start_index|add:forloop.counter0 }}</td>
-                        <td class="admin_fullname"><a href="{% url 'view_admin_detail' pk=admin.id %}">{{ admin.full_name }}</a></td>
-                        <td>{{ admin.email }}</td>
-                        <td>{{ admin.phone_no }}</td>
+                        <td>{{ student.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ student.user.full_name }}</td>
+                        <td>{{ student.user.email }}</td>
+                        <td>{{ student.user.phone_no }}</td>
+                        <td>{{ student.school_name }}</td>
                     </tr>
                    
                 {% endfor %}
