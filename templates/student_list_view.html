@@ -146,6 +146,16 @@
     </button>
    </div>
    <br>
+
+   {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}                            
+        </div>
+    {% endfor %}
+    {% endif %}
+
+    
    <table id="active_student_table" class="table custom-table">
     <thead>
         <tr>
