@@ -3327,17 +3327,29 @@ def invoice_student_download(request,pk):
 
 
 def admin_deleted_records (request):
+    active_tab = request.GET.get('active_tab')
+
     # Retrieve all Student objects from the database
     deleted_student = Student.objects.filter(deleted=True)
-       
+    paginator = Paginator(deleted_student, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    max_pages = paginator.num_pages
+    current_page = page.number
+    page_range = range(max(1, current_page - 2), min(max_pages, current_page + 2) +1)
+
     #Retrieve all User objects with the role 'ADMIN' from the database
     deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
 
     #deleted_class = Tuition_Classes.objects.filter(deleted=True)
-    active_tab = request.GET.get('active_tab')
+    
+
+   
+
 
     context = {
-        'deleted_student': deleted_student,
+        'deleted_student': page,
+        'page_range': page_range,
         'deleted_admin': deleted_admin,
         #'class': deleted_class,
         'active_tab': active_tab,

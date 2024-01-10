@@ -9,16 +9,82 @@
     </head>
 
     <style>
+        .table{
+            width: 100%;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        th{
+            cursor: pointer;
+        }
+
+        .table th, 
+        .table td{
+            padding: 8px;
+        }
+
+        .table th{
+            background-color: #21486C;
+            color: #FFFFFF;
+        }
+
+        .admin_fullname{
+            color: #333;
+        }
+
+        .admin_fullname a{
+            color: #6A76FF;
+            text-decoration: none;
+        }
+
+        .admin_fullname a:hover{
+            color: #1650e1;
+        }
+
+        .admin_rows:hover{
+            background-color: #e4e4e4;
+        }
+
+        .header-wrapper{
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapperspan{
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapper i{
+            margin-left: 4px;
+        }
 
     </style>
 
     <body>
+        <br>
         <table id="deleted_admin_records" class="table custom-table">
             <thead>
-                <tr>
+                <tr class="admin_rows">
                     <th><span>No.</span></th>
-                    <th><span>Name</span></th>
-                    <th><span>Email</span></th>
+                    <th onclick="sortTableTab1(1)">
+                        <div class="header-wrapper">
+                            <span>
+                                Name
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTableTab1(1)">
+                        <div class="header-wrapper">
+                            <span>
+                                Email
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
                     <th><span>Phone No.</span></th>
                 </tr>
             </thead>
@@ -36,7 +102,85 @@
             </tbody>
         </table>
 
+        <!--Boostrap Paginator-->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+                {% if deleted_admin.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ deleted_admin.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+
+                {% for i in page_range %}
+                    {% if i == deleted_admin.number %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ i }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if deleted_admin.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ deleted_admin.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ deleted_admin.paginator.num_pages }}">Last</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
     </body>
+
+    <script>
+        function sortTableTab1(n) {
+          var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+          table = document.getElementById("deleted_admin_records");
+          switching = true;
+          dir = "asc";
+          
+          while (switching) {
+            switching = false;
+            rows = table.rows;
+            
+            for (i = 1; i < (rows.length - 1); i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("td")[n].textContent.toLowerCase();
+              y = rows[i + 1].getElementsByTagName("td")[n].textContent.toLowerCase();
+              
+              if (dir == "asc") {
+                if (x > y) {
+                  shouldSwitch = true;
+                  break;
+                }
+              } else if (dir == "desc") {
+                if (x < y) {
+                  shouldSwitch = true;
+                  break;
+                }
+              }
+            }
+            
+            if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+              switchcount++;
+            } else {
+              if (switchcount === 0 && dir === "asc") {
+                dir = "desc";
+                switching = true;
+              }
+            }
+          }
+        }
+      </script>
 
 
 </html>
