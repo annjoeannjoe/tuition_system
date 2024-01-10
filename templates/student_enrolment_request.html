@@ -521,23 +521,25 @@
 
                                 <!--Form 2 Timetable-->
                                 <div id="form2_timetable" style="display: none;">
-                                    <h6><b>Form 2 Timetable</b></h6>
+                                    <img src="{% static 'images/secondary_form2_timetable.png' %}" width="550" height="900"><br><br>
                                     <div class="row">
                                         {% for subject in secondary_subjects.form2 %}
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label for="{{ subject }}" class="form-label"><b>{{ subject }}</b></label><br>
-                                            <select name="{{ subject }}" class="form-control">
+                                            <select name="{{ subject }}" class="form-control form2-timeslot" required onchange="checkTimetableConflict(this,'error_message_timetable')">
                                                 <option value="" disabled selected>Select Timeslot</option>
                                                 <option value="0">Not Enrolling</option> <!-- Special value for not enrolling -->
                                                 {% for tuition_class in subjects %}
                                                     {% if tuition_class.subject == subject and tuition_class.tuition_class_study_level == "Secondary form2" %}
-                                                        <option value="{{ tuition_class.id }}">{{ tuition_class.tuition_class_name }} {{tuition_class.weekly_day}} {{ tuition_class.general_start_time }} - {{ tuition_class.general_end_time }}</option>
+                                                        <option value="{{ tuition_class.id }}">{{ tuition_class.tuition_class_name }} {{ tuition_class.weekly_day }} {{ tuition_class.general_start_time }} - {{ tuition_class.general_end_time }}</option>
                                                     {% endif %}
                                                 {% endfor %}
                                             </select><br>
                                         </div>
                                         {% endfor %}
-                                    </div><br>
+                                    </div>
+                                    <div id="error_message_timetable" style="color: red;"></div><br>
+                                    <!--<div id="debug_message_timetable" style="color: blue;"></div><br>--> <!-- Added a debug message container --> 
                                 </div>
 
                                 <!--Form 3 Timetable-->
@@ -1230,7 +1232,70 @@
                 }
             }
         }
-    </script>
+
+        function extractDayAndTime(timeslot) {
+    const dayAndTime = timeslot.match(/(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s(\d{1,2}:\d{2}\s[apm.]+)\s-\s(\d{1,2}:\d{2}\s[apm.]+)/);
+    const day = dayAndTime[1];
+    const startTime = dayAndTime[2];
+    const endTime = dayAndTime[3];
+
+    return { day, startTime, endTime };
+}
+
+function checkTimetableConflict(selectedDropdown, errorMessageId) {
+    const selectedTimeslot = selectedDropdown.options[selectedDropdown.selectedIndex].text;
+
+    if (selectedTimeslot === 'Not Enrolling') {
+        document.getElementById(errorMessageId).innerText = '';
+        document.getElementById(debugMessageId).innerHTML = '';
+        return;
+    }
+
+    const { day: selectedDay, startTime: selectedStartTime, endTime: selectedEndTime } = extractDayAndTime(selectedTimeslot);
+
+    let debugInfo = '';
+    const selectedSubject = selectedDropdown.name;
+    let conflictFound = false;
+
+    const previouslySelected = document.querySelectorAll('.form-control.form2-timeslot:not([name="' + selectedSubject + '"])');
+
+    previouslySelected.forEach(function(subject) {
+        const otherSelectedTimeslot = subject.options[subject.selectedIndex].text;
+
+        if (otherSelectedTimeslot !== 'Select Timeslot' && otherSelectedTimeslot !== 'Not Enrolling') {
+            const { day: otherDay, startTime: otherStartTime, endTime: otherEndTime } = extractDayAndTime(otherSelectedTimeslot);
+
+            debugInfo += 'Selected Timeslot: ' + selectedDay + ' ' + selectedStartTime + ' - ' + selectedEndTime + '<br>';
+            debugInfo += 'Other Timeslot: ' + otherDay + ' ' + otherStartTime + ' - ' + otherEndTime + '<br>';
+
+            // Check for conflicts considering overlapping time ranges on the same day
+            if (
+                (selectedStartTime >= otherStartTime && selectedStartTime < otherEndTime && selectedDay === otherDay) ||
+                (selectedEndTime > otherStartTime && selectedEndTime <= otherEndTime && selectedDay === otherDay) ||
+                (selectedStartTime <= otherStartTime && selectedEndTime >= otherEndTime && selectedDay === otherDay)
+            ) {
+                conflictFound = true;
+                debugInfo += 'Conflict found between ' + selectedTimeslot + ' and ' + otherSelectedTimeslot + '<br>';
+            }
+        }
+    });
+
+    if (conflictFound) {
+        document.getElementById(errorMessageId).innerText = 'Conflicting timeslots selected. Please choose non-conflicting timeslots.';
+        document.getElementById(debugMessageId).innerHTML = debugInfo; // Display debug information
+        // Clear debug info after 10 seconds
+        setTimeout(function(){
+            document.getElementById(errorMessageId).innerText = '';
+            document.getElementById(debugMessageId).innerHTML = '';
+        }, 5000);
+    } else {
+        document.getElementById(errorMessageId).innerText = '';
+        setTimeout(function(){
+            document.getElementById(errorMessageId).innerText = '';
+            document.getElementById(debugMessageId).innerHTML = '';
+        }, 5000);
+    }
+}
     </script>
 </html>
 
