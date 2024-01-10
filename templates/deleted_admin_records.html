@@ -1,0 +1,42 @@
+{% extends 'sidebar_admin.html' %}
+{% load static %}
+{% block content %}
+
+<html>
+    <head>
+        <title>
+            Deleted Records Archive
+        </title>
+    </head>
+
+    <style>
+
+    </style>
+
+    <body>
+        <table id="deleted_admin_records" class="table custom-table">
+            <thead>
+                <tr>
+                    <th><span>No.</span></th>
+                    <th><span>Name</span></th>
+                    <th><span>Email</span></th>
+                    <th><span>Phone No.</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in deleted_admin %}
+                    {% if admin.role == 'ADMIN' %}
+                    <tr class="deleted_admin_rows">
+                        <td>{{ admin.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ admin.full_name }}</td>
+                        <td>{{ admin.email }}</td>
+                        <td>{{ admin.phone_no }}</td>
+                    </tr>
+            </tbody>
+        </table>
+
+    </body>
+
+
+</html>
+{% endblock %}

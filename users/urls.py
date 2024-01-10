@@ -90,5 +90,7 @@ urlpatterns = [
    path('admin_add_invoice_item/<int:pk>/', views.admin_add_invoice_item, name="admin_add_invoice_item"),
    path('invoice_pdf/<int:pk>/', views.invoice_pdf, name="invoice_pdf"),
    path('receipt_pdf/<int:pk>/', views.receipt_pdf, name="receipt_pdf"),
-   path('invoice_student_download/<int:pk>/', views.invoice_student_download, name="invoice_student_download")
+   path('invoice_student_download/<int:pk>/', views.invoice_student_download, name="invoice_student_download"),
+   path('admin_deleted_records/', views.admin_deleted_records, name="admin_deleted_records"),
+   path('deleted_admin_records/', views.deleted_admin_records, name="deleted_admin_records"),
 ]  
