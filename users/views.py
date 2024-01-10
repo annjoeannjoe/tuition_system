@@ -3331,7 +3331,7 @@ def admin_deleted_records (request):
 
     #Retrieve all User objects with the role 'ADMIN' from the database
     deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
-    paginator = Paginator(deleted_admin, 2)
+    paginator = Paginator(deleted_admin, 10)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     max_pages = paginator.num_pages
@@ -3340,6 +3340,17 @@ def admin_deleted_records (request):
 
      # Retrieve all Student objects from the database
     deleted_student = Student.objects.filter(deleted=True)
+    second_paginator = Paginator(deleted_student, 1)
+    second_page_number = request.GET.get('second_page')
+    second_page = second_paginator.get_page(second_page_number)
+    max_pages_second = second_paginator.num_pages
+    current_page_second = second_page.number
+    page_range_second = range(max(1, current_page_second - 2), min(max_pages_second, current_page_second + 2) + 1)
+
+
+
+
+
     #Retrieve all User objects with the role 'ADMIN' from the database
     deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
 
@@ -3351,8 +3362,10 @@ def admin_deleted_records (request):
 
     context = {
         'deleted_admin': page,
-        'deleted_student': deleted_student,
         'page_range': page_range,
+        'deleted_student': second_page,
+        'page_range_second': page_range_second,
+        
         #'class': deleted_class,
         'active_tab': active_tab,
     }

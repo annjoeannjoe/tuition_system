@@ -110,6 +110,41 @@
             </tbody>
         </table>
 
+        <!-- Second Pagination Block -->
+   <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+            {% if deleted_student.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?second_page=1&active_tab=tab2">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?second_page={{ deleted_student.previous_page_number }}&active_tab=tab2">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for i in page_range_second %}
+                {% if i == deleted_student.number %}
+                <li class="page-item active">
+                    <span class="page-link">{{ i }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?second_page={{ i }}&active_tab=tab2">{{ i }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if deleted_student.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?second_page={{ deleted_student.next_page_number }}&active_tab=tab2">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?second_page={{ deleted_student.paginator.num_pages }}&active_tab=tab2">Last</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
     </body>
     <script>
         function sortTableTab2(n) {
