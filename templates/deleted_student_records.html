@@ -9,26 +9,107 @@
     </head>
 
     <style>
+        .table{
+            width: 100%;
+            border: 1px solid #ccc;
+            border-collapse: collapse;
+        }
+
+        th{
+            cursor: pointer;
+        }
+
+        .table th, 
+        .table td{
+            padding: 8px;
+        }
+
+        .table th{
+            background-color: #21486C;
+            color: #FFFFFF;
+        }
+
+        .student_fullname{
+            color: #333;
+        }
+
+        .student_fullname a{
+            color: #6A76FF;
+            text-decoration: none;
+        }
+
+        .student_fullname a:hover{
+            color: #1650e1;
+        }
+
+        .student_rows:hover{
+            background-color: #e4e4e4;
+        }
+
+        .header-wrapper{
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapperspan{
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-wrapper i{
+            margin-left: 4px;
+        }
+
+
 
     </style>
 
     <body>
-        <table id="deleted_admin_records" class="table custom-table">
+        <br>
+        <table id="deleted_student_records" class="table custom-table">
             <thead>
-                <tr>
+                <tr class="student_rows">
                     <th><span>No.</span></th>
-                    <th><span>Name</span></th>
-                    <th><span>Email</span></th>
-                    <th><span>Phone No.</span></th>
-                    <th><span>School Name</span></th>
+                    <th onclick="sortTableTab2(1)">
+                        <div class="header-wrapper">
+                            <span>
+                                Name
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTableTab2(2)">
+                        <div class="header-wrapper">
+                            <span>
+                                Email
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTableTab2(3)">
+                        <div class="header-wrapper">
+                            <span>
+                                Phone No.
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
+                    <th onclick="sortTableTab2(1)">
+                        <div class="header-wrapper">
+                            <span>
+                                School Name
+                                <i class="fas fa-sort" style="margin-left: 10px;"></i>
+                            </span>
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>
-                {% for student in deleted_student %}
-                  
+                {% for student in deleted_student %}         
                     <tr class="deleted_admin_rows">
                         <td>{{ student.start_index|add:forloop.counter0 }}</td>
-                        <td>{{ student.user.full_name }}</td>
+                        <td class="student_fullname"><a href="{% url 'view_student_detail' student.id %}">{{ student.user.full_name }}</a></td>
                         <td>{{ student.user.email }}</td>
                         <td>{{ student.user.phone_no }}</td>
                         <td>{{ student.school_name }}</td>
@@ -39,6 +120,48 @@
         </table>
 
     </body>
+    <script>
+        function sortTableTab2(n) {
+          var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+          table = document.getElementById("deleted_student_records");
+          switching = true;
+          dir = "asc";
+          
+          while (switching) {
+            switching = false;
+            rows = table.rows;
+            
+            for (i = 1; i < (rows.length - 1); i++) {
+              shouldSwitch = false;
+              x = rows[i].getElementsByTagName("td")[n].textContent.toLowerCase();
+              y = rows[i + 1].getElementsByTagName("td")[n].textContent.toLowerCase();
+              
+              if (dir == "asc") {
+                if (x > y) {
+                  shouldSwitch = true;
+                  break;
+                }
+              } else if (dir == "desc") {
+                if (x < y) {
+                  shouldSwitch = true;
+                  break;
+                }
+              }
+            }
+            
+            if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+              switchcount++;
+            } else {
+              if (switchcount === 0 && dir === "asc") {
+                dir = "desc";
+                switching = true;
+              }
+            }
+          }
+        }
+      </script>
 
 
 </html>
