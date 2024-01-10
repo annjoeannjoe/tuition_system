@@ -945,7 +945,7 @@ def view_student_detail (request,pk):
 
 def edit_student_detail(request, pk):
     student = get_object_or_404(Student, pk=pk)
-    user=student.user
+    student_user=student.user
 
     # Retrieve the active_tab parameter from the query string
     active_tab = request.GET.get('active_tab')
@@ -1053,7 +1053,7 @@ def edit_student_detail(request, pk):
 
 
     if request.method == "POST":
-        user.full_name = request.POST['full_name']
+        student_user.full_name = request.POST['full_name']
 
         student.school_level = request.POST['school_level']
         if student.school_level == 'primary':
@@ -1071,7 +1071,7 @@ def edit_student_detail(request, pk):
         # Handle the new bankin_receipt uploaded file
         new_bankin_receipt = request.FILES.get('bankin_receipt')
         if new_bankin_receipt:
-            username = user.full_name
+            username = student_user.full_name
             extension = os.path.splitext(new_bankin_receipt.name)[-1]
             
             # Get the count of existing bankin_receipt files
@@ -1087,16 +1087,16 @@ def edit_student_detail(request, pk):
             student.bankin_receipt.save(new_filename, new_bankin_receipt, save=True)
 
         student.classin_phoneno = request.POST['classin_phoneno']
-        user.phone_no = request.POST['phoneNo']
+        student_user.phone_no = request.POST['phoneNo']
         student.parent_phoneno2 = request.POST['parent_phoneno2']
         student.student_phoneno = request.POST['student_phoneno']
-        user.street1 = request.POST['street1']
-        user.street2 = request.POST['street2']
-        user.city = request.POST['city']
-        user.postalcode = request.POST['postalcode']
-        user.state = request.POST['state']
+        student_user.street1 = request.POST['street1']
+        student_user.street2 = request.POST['street2']
+        student_user.city = request.POST['city']
+        student_user.postalcode = request.POST['postalcode']
+        student_user.state = request.POST['state']
 
-        user.save()
+        student_user.save()
         student.save()
 
         messages.success(request,'The changes have been successfully updated.')
@@ -1104,7 +1104,7 @@ def edit_student_detail(request, pk):
     
 
     context={
-        'user': user,
+        'student_user': student_user,
         'student': student,
         'student_bankin_receipt_name': os.path.basename(student.bankin_receipt.url),
         'student_ic_photo_name': os.path.basename(student.student_ic_photo.url),
