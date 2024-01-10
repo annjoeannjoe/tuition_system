@@ -1,0 +1,143 @@
+{% extends "sidebar_admin.html" %}
+
+{% block content %} 
+<html>
+    <head>
+    </head>
+        
+    <style>
+        .tab-pane{
+            background-color: #FFFFFF;
+        }
+
+        /* Add a class for the background container */
+        .content-container {
+            background-color: #F8F8F8; 
+            padding: 15px 5%;
+            padding-top: 10px;
+            padding-bottom: 20px;
+            border-radius: 10px; 
+            margin: 0 auto;
+        }
+            
+        .containerbutton{
+            background-color: #FFFFFF;
+            padding: 15px 5%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .containerbutton .back-button{
+            margin-right: auto; /* Push the back button to the left side*/
+        }
+
+        .edit-button{
+            width: 80px;
+            height: 35px;
+            font-size: 15px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: auto;  
+        }
+
+        .delete-button{
+            width: 80px;
+            height: 35px;
+            font-size: 15px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 5px;
+        }
+
+        .back-button{
+            width: 80px;
+            height: 35px;
+            font-size: 15px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /*.form-control{
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            width: 100%;
+        }*/
+
+   
+    </style>
+        
+    <body>
+        <div class="container mt-5">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#tab1">Admin's Details</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="tab1" class="tab-pane fade show active">
+                 
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token%}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+
+                        <div class="content-container">
+                            <br>
+                            <label for="full_name" class="form-label" ><b>&nbspFull Name</b></label><br>
+                            <input type="text" class="form-control" id="full_name" name="full_name" value="{{user.full_name}}" disabled>
+                                
+                            <br>
+                            <label for="email" class="form-label"><b>&nbspEmail</b></label><br>
+                            <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" disabled>
+                
+                            <br>
+                            <label for="phoneNo" class="form-label"><b>&nbspPhone No.</b></label><br>
+                            <input type="text" class="form-control" id="phoneNo" name="phoneNo" value="{{user.phone_no}}" disabled>
+                    
+                            <br><br>
+                            <label for="studenthomeaddress" class="form-label"><b>&nbspHome Address</b></label>
+                            <br> 
+                            <label for="street1" class="form-label"><b>&nbspStreet 1</b></label><br>
+                            <input type="text" class="form-control" id="street1" name="street1" value="{{user.street1}}" disabled>
+                            <br>
+                            <label for="street2" class="form-label"><b>&nbspStreet 2</b></label><br>
+                            <input type="text" class="form-control" id="street2" name="street2" value="{{user.street2}}" disabled>
+                            <br>
+                            <label for="city" class="form-label"><b>&nbspCity</b></label><br>
+                            <input type="text" class="form-control" id="city" name="city" value="{{user.city}}" disabled>
+                            <br>
+                            <label for="postalcode" class="form-label"><b>&nbspPostal Code</b></label><br>
+                            <input type="text" class="form-control" id="postalcode" name="postalcode" value="{{user.postalcode}}" disabled>
+                            <br>
+                            <label for="state" class="form-label"><b>&nbspState</b></label><br>
+                            <input type="text" class="form-control" id="state" name="state" value="{{user.state}}" disabled> 
+                            <br>
+                        </div>
+            
+                        
+                    </form> 
+                    <br>
+
+                </div>
+            </div>
+        </div>
+        
+        
+    </body>
+</html>
+
+{% endblock %}
+

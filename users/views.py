@@ -3348,7 +3348,7 @@ def admin_deleted_records (request):
     page_range_second = range(max(1, current_page_second - 2), min(max_pages_second, current_page_second + 2) + 1)
 
     deleted_class = Tuition_Classes.objects.filter(deleted=True)
-    third_paginator = Paginator(deleted_class, 1)
+    third_paginator = Paginator(deleted_class, 10)
     third_page_number = request.GET.get('third_page')
     third_page = third_paginator.get_page(third_page_number)
     max_pages_third = third_paginator.num_pages
@@ -3379,3 +3379,7 @@ def deleted_admin_records (request):
 def deleted_student_records(request):
 
     return render(request, 'deleted_student_records.html')
+
+def deleted_view_admin_detail (request,pk):
+    user = get_object_or_404(User, pk=pk, role='ADMIN')
+    return render (request, 'deleted_view_admin_detail.html', {'user': user})

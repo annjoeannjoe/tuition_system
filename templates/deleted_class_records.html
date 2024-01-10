@@ -106,7 +106,7 @@
             <tbody>
                 {% for classes in deleted_class %}         
                     <tr class="deleted_admin_rows">
-                        <td>{{ student.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ deleted_class.start_index|add:forloop.counter0 }}</td>
                         <td class="classname"><a href="{% url 'admin_view_class_detail' classes.id%}">{{ classes.tuition_class_name }}</a></td>
                         <td>{{ classes.subject }}</td>
                         <td>{{ classes.tuition_class_study_level }}</td>
