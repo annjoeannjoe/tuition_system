@@ -85,8 +85,7 @@
                             </span>
                         </div>
                     </th>
-                    <th><span>Phone No.</span></th>
-                    <th onclick="sortTableTab3(4)">
+                    <th onclick="sortTableTab3(3)">
                         <div class="header-wrapper">
                             <span>
                                 Study Level
@@ -94,7 +93,7 @@
                             </span>
                         </div>
                     </th>
-                    <th onclick="sortTableTab3(5)">
+                    <th onclick="sortTableTab3(4)">
                         <div class="header-wrapper">
                             <span>
                                 Class Time
@@ -108,10 +107,12 @@
                 {% for classes in deleted_class %}         
                     <tr class="deleted_admin_rows">
                         <td>{{ student.start_index|add:forloop.counter0 }}</td>
-                        <td class="classname"><a href="{% url 'admin_view_class_detail' classes.id%}">{{ student.user.full_name }}</a></td>
-                        <td>{{ student.user.email }}</td>
-                        <td>{{ student.user.phone_no }}</td>
-                        <td>{{ student.school_name }}</td>
+                        <td class="classname"><a href="{% url 'admin_view_class_detail' classes.id%}">{{ classes.tuition_class_name }}</a></td>
+                        <td>{{ classes.subject }}</td>
+                        <td>{{ classes.tuition_class_study_level }}</td>
+                        <td>Every {{ classes.weekly_day}}
+                            <h6><span style="font-size: smaller;">{{ classes.general_start_time }} to {{ classes.general_end_time }}</span></h6>
+                        </td>
                     </tr>
                    
                 {% endfor %}

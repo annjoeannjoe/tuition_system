@@ -92,7 +92,7 @@
                 {% for admin in deleted_admin %}
                   
                     <tr class="deleted_admin_rows">
-                        <td>{{ admin.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ deleted_admin.start_index|add:forloop.counter0 }}</td>
                         <td class="admin_fullname"><a href="{% url 'view_admin_detail' pk=admin.id %}">{{ admin.full_name }}</a></td>
                         <td>{{ admin.email }}</td>
                         <td>{{ admin.phone_no }}</td>

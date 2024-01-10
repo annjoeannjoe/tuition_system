@@ -99,7 +99,7 @@
             <tbody>
                 {% for student in deleted_student %}         
                     <tr class="deleted_admin_rows">
-                        <td>{{ student.start_index|add:forloop.counter0 }}</td>
+                        <td>{{ deleted_student.start_index|add:forloop.counter0 }}</td>
                         <td class="student_fullname"><a href="{% url 'view_student_detail' student.id %}">{{ student.user.full_name }}</a></td>
                         <td>{{ student.user.email }}</td>
                         <td>{{ student.user.phone_no }}</td>
