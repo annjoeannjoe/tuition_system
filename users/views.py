@@ -3342,7 +3342,7 @@ def admin_deleted_records (request):
         #'class': deleted_class,
         'active_tab': active_tab,
     }
-    return render (request, 'admin_student_list.html', context)
+    return render (request, 'admin_deleted_records.html', context)
 
 def deleted_admin_records (request):
     deleted_admin = User.objects.filter(role='ADMIN', deleted=True)
