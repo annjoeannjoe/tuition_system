@@ -564,7 +564,7 @@ def addnewstudent (request):
                         )
                         enrolment.save()
 
-        messages.success(request, "New student has successfully added.")
+        messages.success(request, "New student is successfully added.")
         return redirect(reverse('student_list_view'))
     return render (request, "addnewstudent.html", context)
 
@@ -1220,7 +1220,7 @@ def addnewadmin (request):
         admin = Admin(user=new_user)
         admin.save()
     
-
+        messages.success(request, "New admin is successfully added.")
         return redirect('admin_list_view')
     return render (request, "addnewadmin.html")
 
@@ -1779,7 +1779,7 @@ def admin_add_class(request):
             general_start_time = general_start_time,
             general_end_time = general_end_time,
             class_start_date = class_start_date,
-            class_end_date = class_end_date,
+            class_end_date = class_end_date,    
             admin = admin_user,
         )
         tuition_class.save()
