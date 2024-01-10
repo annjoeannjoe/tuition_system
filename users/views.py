@@ -3383,3 +3383,76 @@ def deleted_student_records(request):
 def deleted_view_admin_detail (request,pk):
     user = get_object_or_404(User, pk=pk, role='ADMIN')
     return render (request, 'deleted_view_admin_detail.html', {'user': user})
+
+
+
+def deleted_view_student_detail (request,pk):
+    student = get_object_or_404(Student, pk=pk)
+
+    #Filter enrollments related to student 
+    student_enrollments = Enrolment.objects.filter(student=student)
+
+    # Retrieve the 'Add' enrolments with 'Accepted' status for the student
+    add_enrolments = Enrolment.objects.filter(
+        request_type = 'Add',
+        request_status = 'Accepted',
+        student = student
+    )
+
+    # Create a list of vlass IDs for which 'Drop' requests have been accepeted
+    drop_classes = set()
+    for enrolment in add_enrolments:
+        drop_enrolments = Enrolment.objects.filter(
+            request_type = 'Drop',
+            request_status = 'Accepted',
+            tuition_classes = enrolment.tuition_classes
+        ).first()
+
+        if drop_enrolments:
+            drop_classes.add(enrolment.tuition_classes_id)
+    
+    # Filter classes to display 
+    classes_enrolled = add_enrolments.exclude(tuition_classes__id__in=drop_classes)
+    active_tab = request.GET.get('active_tab')
+    paginator = Paginator(classes_enrolled, 10)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    max_pages = paginator.num_pages
+    current_page = page.number
+    page_range = range(max(1, current_page -2), min(max_pages, current_page + 2) + 1)
+
+    added_enrolments = Enrolment.objects.filter(
+        Q(request_type = 'Add') & (Q(request_status = 'Accepted') | Q(request_status = 'Rejected')), student = student
+    ).order_by('-request_responded_at')
+
+    dropped_enrolments = Enrolment.objects.filter(
+        Q(request_type = 'Drop') & (Q(request_status = 'Accepted') | Q(request_status = 'Rejected')), student = student
+    ).order_by('-request_responded_at')
+
+    enrolment_requests = Enrolment.objects.filter(student=student, request_status ='Pending')
+    second_paginator = Paginator(enrolment_requests, 1)
+    second_page_number = request.GET.get('second_page')
+    second_page = second_paginator.get_page(second_page_number)
+    max_pages_second = second_paginator.num_pages
+    current_page_second = second_page.number
+    page_range_second = range(max(1, current_page_second - 2), min(max_pages_second, current_page_second + 2) + 1)
+    
+    # Filter evaluations created by the respective student
+    student_evaluations = Subject_Evaluation.objects.filter(student=student)
+
+    context={
+       'student': student,
+       'student_bankin_receipt_name': os.path.basename(student.bankin_receipt.url),
+       'student_ic_photo_name': os.path.basename(student.student_ic_photo.url),
+       'student_photo_name': os.path.basename(student.student_photo.url),
+       'student_enrollments': student_enrollments,
+       'classes_enrolled': page,
+       'page_range': page_range,
+        'added_enrolments': added_enrolments,
+        'dropped_enrolments': dropped_enrolments,
+        'student_evaluations': student_evaluations,
+        'enrolment_requests': second_page,
+        'page_range_second': page_range_second,
+        'active_tab': active_tab,
+    }
+    return render (request, 'deleted_view_student_detail.html', context)
