@@ -1543,7 +1543,7 @@ def accept_enrolment(request, request_id):
         enrolment_request.stop_at = enrolment_request.request_responded_at
 
         enrolment_request.save()
-
+    
         return redirect('admin_enrolment_request')
 
 def reject_enrolment(request, request_id):
@@ -2551,6 +2551,7 @@ def admin_payment_status(request):
 
     # Extract receipt file names for each invoice
     for invoice in invoices:
+        
         invoice.receipt_file_name = os.path.basename(invoice.receipt_file.url) if invoice.receipt_file else None
 
     context={
